@@ -1,12 +1,20 @@
-from Crypto.Cipher import AES
+# basic libraries  
 import base64
-import hashlib
 
+# cryptographic tools
+import hashlib
+from Crypto.Cipher import AES
 
 class AESCipher(object):
 
     def __init__(self):
         self.key = 's$lphuTr?43&*u-eNlv*@+3re8!o5hi2H!1u5rus5op4asp1Bu&6C3Wr33?l-rEk'
+
+    def nonce_from_OTP(self, otp):
+        m = hashlib.sha256()
+        m.update(otp)
+
+        return m.digest()
 
     def encrypt(self, raw):
         raw = pad(raw)
