@@ -4,23 +4,6 @@ from backend.globals import SERVER_IP, SERVER_PORT, USER_TOKEN
 # Client - Basic functionalities
 
 
-def login(credentials):
-    # do something
-    global USER_TOKEN
-
-    auth_token = ''
-    USER_TOKEN = auth_token
-
-    return 1
-
-
-def logout():
-    global USER_TOKEN
-
-    USER_TOKEN = '0x0000000000'
-    return -1
-
-
 def secure_send(file):  # To send a file to the server
     # do something
     return 0

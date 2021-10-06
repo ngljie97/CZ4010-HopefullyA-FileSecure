@@ -1,37 +1,61 @@
 # basic libraries
-import globals
+import os
 import base64
 
 # cryptographic tools
-import hashlib
 from Crypto.Cipher import AES
+from Crypto.Hash import SHA512
 from Crypto import Random
-from Crypto.Util.Padding import pad, unpad
 from Crypto.Protocol.KDF import PBKDF2
 
 
+# implementation of AES256 symmetric key encryption for file encryption.
 class AESCipher(object):
+    def __init__(self, password):
+        salt = '?4H-nUw_1GaG0t0I'
+        self.key = PBKDF2(password,
+                          salt,
+                          32,
+                          count=1000000,
+                          hmac_hash_module=SHA512)
 
-    def __init__(self):
-        self.key = 's$lphuTr?43&*u-eNlv*@+3re8!o5hi2H!1u5rus5op4asp1Bu&6C3Wr33?l-rEk'
-        self.salt = 'S=ad7eT+Z6TaDRL_'
+    def encrypt(self, file):
+        nonce = Random.new().read(AES.block_size)
+        # extra step: store hash of nonce to ensure that it was never used before. else regen.
+        cipher = AES.new(self.key, AES.MODE_EAX, nonce=nonce)
 
-    def nonce_from_OTP(self, otp):  # Generate a nonce using a time based OTP using SHA256
-        m = hashlib.sha256()
-        m.update(globals.USER_TOKEN)
-        m.update(otp)
+        with open(file, 'rb') as f:
+            input = f.read()
+            ciphertext, tag = cipher.encrypt_and_digest(input)
 
-        return m.digest()
+        a = len(nonce)
+        b = len(tag)
 
-    def encrypt(self, file, otp):  # Encrypt file in CTR mode with AES
-        iv = self.nonce_from_OTP(otp)
-        cipher = AES.new(self.key, AES.MODE_CTR, iv)
-        raw = pad(file, AES.block_size)
-        ciphertext, tag = cipher.encrypt_and_digest(raw)
-        return base64.b64encode(iv + cipher.encrypt(raw))
+        out_file = file + '.enc'
 
-    def decrypt(self, enc):
-        enc = base64.b64decode(enc)
-        iv = enc[:16]
-        cipher = AES.new(self.key, AES.MODE_CBC, iv)
-        return unpad(cipher.decrypt(enc[16:]))
+        with open(out_file, 'wb') as f:
+            f.write(nonce + tag + ciphertext)
+
+    def decrypt(self, enc_file):
+        with open(enc_file, 'rb') as f:
+            nonce = f.read(16)
+            tag = f.read(16)
+            ciphertext = f.read()
+
+        cipher = AES.new(self.key, AES.MODE_EAX, nonce=nonce)
+
+        data = cipher.decrypt_and_verify(ciphertext, tag)
+
+        out_file = enc_file + '.dec'
+
+        with open(out_file, 'wb') as f:
+            f.write(data)
+
+
+""" cipher = AESCipher('12345')
+cipher.encrypt(
+    "C:\\Users\\nglji\\OneDrive\\Documents\\School\\CZ4010\\backend\\test\\original.txt"
+)
+cipher.decrypt(
+    "C:\\Users\\nglji\\OneDrive\\Documents\\School\\CZ4010\\backend\\test\\original.txt.enc"
+) """

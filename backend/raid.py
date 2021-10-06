@@ -1,3 +1,5 @@
+import os
+
 
 # XOR the entire array of bytes, byte by byte
 def bytewise_xor(bytes1, bytes2):
@@ -11,7 +13,7 @@ def bytewise_xor(bytes1, bytes2):
 
 def compute_parity(enc_file):  # Function to compute the "parity file"
     filesize = len(enc_file)
-    half = int(filesize/2)
+    half = int(filesize / 2)
 
     share1 = enc_file[0:half]
     share2 = enc_file[half:]
