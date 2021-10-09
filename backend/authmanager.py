@@ -6,7 +6,7 @@ class AuthManager:
     def __init__(self):
         global auth
 
-        seviceAccount = globals.PROJ_ROOT + '\\backend\\secret\\cz4010fs-firebase-adminsdk-smbfr-f110620aaa.json'
+        seviceAccount = globals.PROJ_ROOT + '\\backend\\secret\\firebase-privatekey.json'
         config = {
             "apiKey": "AIzaSyBd9GRTbL_lIZyJtpQkUfvGwfXmzwuDszc",
             "authDomain": "cz4010fs.firebaseapp.com",
