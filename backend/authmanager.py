@@ -1,5 +1,6 @@
+import json
 import pyrebase
-import globals
+from . import globals
 
 
 class AuthManager:
@@ -24,15 +25,22 @@ class AuthManager:
             user = auth.create_user_with_email_and_password(email, password)
             # auth.send_email_verification(user['idToken'])
 
-        except:
-            return 'Error creating user.'
+        except Exception as e:
+            error_json = e.args[1]
+            error = json.loads(error_json)['error']
+            return 'Sign up failed with error: ' + error['message']
 
         return user['idToken']
 
     def signin(self, email, password):
-        globals.AUTH_USER = auth.sign_in_with_email_and_password(
-            email, password)
-        return globals.AUTH_USER['localId']
+        try:
+            globals.AUTH_USER = auth.sign_in_with_email_and_password(
+                email, password)
+            return 'Successfully signed in as ' + globals.AUTH_USER['localId']
+        except Exception as e:
+            error_json = e.args[1]
+            error = json.loads(error_json)['error']
+            return 'Sign in failed with error: ' + error['message']
 
     def signout(self):
         globals.AUTH_USER = {}

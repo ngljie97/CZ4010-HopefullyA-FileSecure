@@ -7,7 +7,9 @@ def init():
     global SERVER_IP
     global SERVER_PORT
 
+    # Basic variables initialization for program to run
     PROJ_ROOT = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
     AUTH_USER = {}
+
     SERVER_IP = '127.0.0.1'
     SERVER_PORT = 65432
