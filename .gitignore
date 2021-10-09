@@ -1,1 +1,4 @@
 .venv
+.vscode
+backend/test/
+backend/secret/
