@@ -14,3 +14,10 @@ Project: Secure File-Sharing platform with untrusted Intermediary
 ### Dependencies controls
 pip3 freeze > requirements.txt
 pip3 install -r requirements.txt
+
+## To-Do List
+1. Parts integration (split, encrypt, send to server).
+2. Implement asymmetric exchange of file password between 2 users.
+3. File storage in server.
+4. "User -> file" log (for ensuring non-repudiation of files.)
+----------------------------------------------------------------------

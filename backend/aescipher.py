@@ -28,9 +28,6 @@ class AESCipher(object):
             input = f.read()
             ciphertext, tag = cipher.encrypt_and_digest(input)
 
-        a = len(nonce)
-        b = len(tag)
-
         out_file = file + '.enc'
 
         with open(out_file, 'wb') as f:
