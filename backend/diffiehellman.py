@@ -49,7 +49,7 @@ a = 4
 b = 3
 
 pka = publicKey(a)
-pkb = publicKey(b,)
+pkb = publicKey(b)
 
 shareKey1 = secretSharedKey(pkb,a)
 shareKey2 = secretSharedKey(pka,b)
