@@ -37,12 +37,24 @@ def publicKey(n): # User's public key, n is user secret key
     key = int(pow(G,n,P))
     return key
 
-def secretKey(pk, n): # pk is the other party public key, n is user secret key
+def secretSharedKey(pk, n): # pk is the other party public key, n is user secret key
     skey = int(pow(pk,n,P))
     return skey
 
 P = generateRandomPrime() # mod n / large generated prime number (known)
 G = generateRandomPrimitive() # known number
 
+# Test #
+a = 4
+b = 3
+
+pka = publicKey(a)
+pkb = publicKey(b,)
+
+shareKey1 = secretSharedKey(pkb,a)
+shareKey2 = secretSharedKey(pka,b)
+
+print(shareKey1)
+print(shareKey2)
 
         
