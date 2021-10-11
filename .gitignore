@@ -2,5 +2,7 @@
 .vscode
 backend/test/
 backend/secret/
-backend/__pycache__
-frontend/__pycache__
+backend/__pycache__/
+frontend/__pycache__/
+backend\__pycache__\
+frontend\__pycache__
