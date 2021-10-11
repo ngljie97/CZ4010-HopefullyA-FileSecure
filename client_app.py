@@ -1,16 +1,16 @@
 from backend import globals
-from backend.authmanager import AuthManager
+from backend.controllers.auth_controller import AuthManager
+from backend.controllers.client_controller import secure_download, secure_send
 from frontend import client_view as view
-import os
 
 globals.init()
 auth = AuthManager()
 
-while (True):
+while not globals.IS_AUTHENTICATED:
     option = view.index_page()
 
     if option == '1':
-        attmp = 3
+        attmp = globals.MAX_LOGIN_ATTEMPTS
         while (True):
             if attmp == 0:
                 print(
@@ -26,7 +26,7 @@ while (True):
             print(auth.signin(email=email, password=password))
             email, password = (0, 0)
 
-            if len(globals.AUTH_USER) > 1:
+            if globals.IS_AUTHENTICATED:
                 break
             else:
                 attmp = attmp - 1
@@ -37,11 +37,23 @@ while (True):
         email, password = (0, 0)
         input('Press enter to continue...')
 
-    if len(globals.AUTH_USER) > 1:
-        option = view.user_menu()
+while globals.IS_AUTHENTICATED:
 
-        if option == '1':
-            file_location, passkey = view.upload_file_page()
+    option = view.user_menu()
 
-        elif option == '2':
-            view.dwload_file_page()
+    if option == '1':
+        file_location, passkey = view.upload_file_page()
+        secure_send(file_location, passkey)
+        input('Press enter to continue...')
+
+    elif option == '2':
+        file_name, dest_dir = view.dwload_file_page()
+        secure_download(file_name, dest_dir)
+        input('Press enter to continue...')
+
+    elif option == '3':
+        #do something
+        print()
+
+    elif option == '4':
+        auth.signout()

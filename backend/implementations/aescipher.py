@@ -1,5 +1,3 @@
-# basic libraries
-
 # cryptographic tools
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA512
@@ -13,6 +11,13 @@ class AESCipher(object):
         salt = '?4H-nUw_1GaG0t0I'
         self.key = PBKDF2(password,
                           salt,
+                          32,
+                          count=1000000,
+                          hmac_hash_module=SHA512)
+
+    def destroy(self):
+        self.key = PBKDF2('0123456789',
+                          '9876543210123122',
                           32,
                           count=1000000,
                           hmac_hash_module=SHA512)

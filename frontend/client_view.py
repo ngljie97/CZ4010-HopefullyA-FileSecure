@@ -30,6 +30,7 @@ def user_menu():
     print('1. Upload a file.')
     print('2. Download a file.')
     print('3. View file requests.')
+    print('4. Logout.')
     return input('Enter your choice:\t')
 
 
@@ -40,4 +41,7 @@ def upload_file_page():
 
 
 def dwload_file_page():
-    print('')
+    print('List of files:')
+    file_name = input('Enter name of file to download:\t')
+    dest_dir = input('Enter destination directory:\t')
+    return (file_name, dest_dir)

@@ -18,7 +18,7 @@ class Raid3Manager(object):
 
         return hash_md5.hexdigest()
 
-    def bytes_xor(byte1, byte2):
+    def bytes_xor(self, byte1, byte2):
         return bytes([a ^ b for a, b in zip(byte1, byte2)])
 
     # Splice and compute the parity, directly written to the source directory.
