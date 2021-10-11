@@ -27,6 +27,7 @@ def secure_send(input_file, enc_key):
         del_file(file)
     crypt.destroy()
     crypt = ''
+    ### Create database entry
 
     ### Create database entry
     db_controller = DataManager()
@@ -83,8 +84,13 @@ def del_file(file):
         os.remove(file)
 
 
-def start_client():
+def start_client(file_name):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        
         s.connect((globals.SERVER_IP, globals.SERVER_PORT))
+        for i in range(1,4): # Sending each part seperately to the server
+            s.send(file_name + '.p' + str(i) + '.enc')
+
+
         # s.sendall(b'Hello, world') <- Send data to server
         # data = s.recv(1024) <- Receive from server
