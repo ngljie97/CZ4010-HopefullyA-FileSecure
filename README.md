@@ -34,27 +34,28 @@ Project: Secure File-Sharing platform with untrusted Intermediary
 ><li>Updated feature to sign out in auth_controller. Now clears the the AUTH_USER and sets IS_AUTHENTICATED to False.</li>
 ><ol>
 ><li>Updated the signin function to make use of the new global variables.</li>
+></ol>
 ><li>Added the option to sign out in client_view.</li>
 ></ol>
-
-> On-going development:
-><ol>
-><li>RSA and Diffiehellman key exchange of the file encryption key.</li>
-><li>Sending and receiving files to and from server.</li>
-><li>Database for storing file information and tag user for non-repudiation.</li>
-><li>Database log for uploads and download requests.</li>
-></ol>
+>
+>>On-going development:
+>><ol>
+>><li>RSA and Diffiehellman key exchange of the file encryption key.</li>
+>><li>Sending and receiving files to and from server.</li>
+>><li>Database for storing file information and tag user for non-repudiation.</li>
+>><li>Database log for uploads and download requests.</li>
+>></ol>
 
 ### V 1.1:
 ><ol>
 ><li>Updated directory structure. Separate controllers and implementaion classes.</li>
 ><li>RAID and AES implementation completed.</li>
 ></ol>
-
-> On-going development:
-><li>RSA and Diffiehellman implementation added.</li>
-><li>Sending and receiving files to and from server.</li>
-></ol>
+>
+>>On-going development:
+>><li>RSA and Diffiehellman implementation added.</li>
+>><li>Sending and receiving files to and from server.</li>
+>></ol>
 
 ### V 1.0:
 ><ol>
