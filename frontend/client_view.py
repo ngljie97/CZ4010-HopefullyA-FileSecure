@@ -17,6 +17,7 @@ def index_page():
     print('What would you like to do?')
     print('1. Log-in')
     print('2. Sign-up')
+    print('3. Exit')
     return input('Enter your choice:\t')
 
 

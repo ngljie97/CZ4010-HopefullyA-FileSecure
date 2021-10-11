@@ -19,15 +19,15 @@ def init():
     IS_AUTHENTICATED = False
     SERVER_IP = '127.0.0.1'
     SERVER_PORT = 65432
-
-    seviceAccount = globals.PROJ_ROOT + '\\backend\\secret\\firebase-privatekey.json'
-    config = {
-        "apiKey": "AIzaSyBd9GRTbL_lIZyJtpQkUfvGwfXmzwuDszc",
-        "authDomain": "cz4010fs.firebaseapp.com",
+    FIREBASE_CONN = pyrebase.initialize_app({
+        "apiKey":
+        "AIzaSyBd9GRTbL_lIZyJtpQkUfvGwfXmzwuDszc",
+        "authDomain":
+        "cz4010fs.firebaseapp.com",
         "databaseURL":
         "https://cz4010fs-default-rtdb.asia-southeast1.firebasedatabase.app/",
-        "storageBucket": "cz4010fs.appspot.com",
-        "serviceAccount": seviceAccount
-    }
-
-    FIREBASE_CONN = pyrebase.initialize_app(config)
+        "storageBucket":
+        "cz4010fs.appspot.com",
+        "serviceAccount":
+        PROJ_ROOT + '\\backend\\secret\\firebase-privatekey.json'
+    })

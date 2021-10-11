@@ -6,7 +6,8 @@
 ## About the project
 Project: Secure File-Sharing platform with untrusted Intermediary
 
-## How to use
+## Getting started
+
 <- to be added next time ->
 
 #### Directory stucture
@@ -15,18 +16,26 @@ Project: Secure File-Sharing platform with untrusted Intermediary
   - backend\controllers\  : Python files meant for interaction between objects/classes.
 - frontend\ : containing code meant for displaying the front facing user interface.
 
-### Dependencies controls
-- Export project dependencies
-  - pip3 freeze > requirements.txt
-- Installing project dependencies
-  - pip3 install -r requirements.txt
-
+#### Export project dependencies
+```
+pip3 freeze > requirements.txt
+```
+#### Installing project dependencies
+```
+pip3 install -r requirements.txt
+```
 <br/>
 <hr/>
-
 <br/>
 
 ## Changelog
+### V1.3:
+><ol>
+><li>Added data_controller for communication with Firebase database.</li>
+><li>Initial integration to include insertion of database entries.</li>
+><li>Changes to global variables to cater for more variables sharing</li>
+></ol>
+
 ### V1.2:
 ><ol>
 ><li>Added IS_AUTHENTICATED bool expression to globals variable.</li>
@@ -37,25 +46,12 @@ Project: Secure File-Sharing platform with untrusted Intermediary
 ></ol>
 ><li>Added the option to sign out in client_view.</li>
 ></ol>
->
->>On-going development:
->><ol>
->><li>RSA and Diffiehellman key exchange of the file encryption key.</li>
->><li>Sending and receiving files to and from server.</li>
->><li>Database for storing file information and tag user for non-repudiation.</li>
->><li>Database log for uploads and download requests.</li>
->></ol>
 
 ### V 1.1:
 ><ol>
 ><li>Updated directory structure. Separate controllers and implementaion classes.</li>
 ><li>RAID and AES implementation completed.</li>
 ></ol>
->
->>On-going development:
->><li>RSA and Diffiehellman implementation added.</li>
->><li>Sending and receiving files to and from server.</li>
->></ol>
 
 ### V 1.0:
 ><ol>
