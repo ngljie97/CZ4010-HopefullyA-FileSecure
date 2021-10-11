@@ -7,7 +7,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from diffiehellman import publicKey
 
 
-# Generating key (Do i store it in array or dictionary??)
+# Generating key (Public key to be stored in database, private key stored in client machine)
 def generateKey():
     private_key = rsa.generate_private_key(public_exponent=65537,
                                            key_size=2048,
