@@ -16,17 +16,17 @@ pip3 freeze > requirements.txt
 pip3 install -r requirements.txt
 
 ## Changelog
-V 1.0
-    1. Initial drafting of code skeletal structure and code testing classes.
-    2. Lots of trial-and-error steps ommited from the changelog.
+V 1.0:
+1. Initial drafting of code skeletal structure and code testing classes.
+2. Lots of trial-and-error steps ommited from the changelog.
 
-V 1.1
-    1. Updated directory structure. Separate controllers and implementaion classes.
-    2. RAID and AES implementation completed.
+V 1.1:
+1. Updated directory structure. Separate controllers and implementaion classes.
+2. RAID and AES implementation completed.
     
-    On-going development:
-    1. RSA and Diffiehellman implementation added.
-    2. Sending and receiving files to and from server.
+  On-going development:
+  1. RSA and Diffiehellman implementation added.
+  2. Sending and receiving files to and from server.
 
 
 ## To-Do List
