@@ -1,24 +1,11 @@
 import json
-import pyrebase
 from backend import globals
 
 
 class AuthManager:
     def __init__(self):
         global auth
-
-        seviceAccount = globals.PROJ_ROOT + '\\backend\\secret\\firebase-privatekey.json'
-        config = {
-            "apiKey": "AIzaSyBd9GRTbL_lIZyJtpQkUfvGwfXmzwuDszc",
-            "authDomain": "cz4010fs.firebaseapp.com",
-            "databaseURL":
-            "https://cz4010fs-default-rtdb.asia-southeast1.firebasedatabase.app/",
-            "storageBucket": "cz4010fs.appspot.com",
-            "serviceAccount": seviceAccount
-        }
-
-        firebase = pyrebase.initialize_app(config)
-        auth = firebase.auth()
+        auth = globals.FIREBASE_CONN.auth()
 
     def signup(self, email, password):
         try:
