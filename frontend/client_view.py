@@ -29,6 +29,7 @@ def cred_prompt():
 def user_menu():
     print('1. Upload a file.')
     print('2. Download a file.')
+    print('3. View file requests.')
     return input('Enter your choice:\t')
 
 

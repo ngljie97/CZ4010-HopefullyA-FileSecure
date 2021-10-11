@@ -1,6 +1,4 @@
 # basic libraries
-import os
-import base64
 
 # cryptographic tools
 from Crypto.Cipher import AES
@@ -33,6 +31,8 @@ class AESCipher(object):
         with open(out_file, 'wb') as f:
             f.write(nonce + tag + ciphertext)
 
+        return out_file
+
     def decrypt(self, enc_file):
         with open(enc_file, 'rb') as f:
             nonce = f.read(16)
@@ -43,10 +43,12 @@ class AESCipher(object):
 
         data = cipher.decrypt_and_verify(ciphertext, tag)
 
-        out_file = enc_file + '.dec'
+        out_file = enc_file[:-4]
 
         with open(out_file, 'wb') as f:
             f.write(data)
+
+        return out_file
 
 
 """ cipher = AESCipher('12345')
