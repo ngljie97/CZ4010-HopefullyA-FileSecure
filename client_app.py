@@ -37,6 +37,9 @@ while not globals.IS_AUTHENTICATED:
         email, password = (0, 0)
         input('Press enter to continue...')
 
+    elif option == '3':
+        exit()
+
 while globals.IS_AUTHENTICATED:
 
     option = view.user_menu()

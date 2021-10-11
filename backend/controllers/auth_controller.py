@@ -2,7 +2,7 @@ import json
 from backend import globals
 
 
-class AuthManager:
+class AuthManager(object):
     def __init__(self):
         global auth
         auth = globals.FIREBASE_CONN.auth()
@@ -17,7 +17,7 @@ class AuthManager:
             error = json.loads(error_json)['error']
             return 'Sign up failed with error: ' + error['message']
 
-        return user['idToken']
+        return 'Succesfully created an account with ' + email
 
     def signin(self, email, password):
         try:
@@ -26,7 +26,7 @@ class AuthManager:
 
             globals.IS_AUTHENTICATED = True
 
-            return 'Successfully signed in as ' + globals.AUTH_USER['localId']
+            return 'Successfully signed in as ' + email
 
         except Exception as e:
             error_json = e.args[1]
@@ -37,7 +37,7 @@ class AuthManager:
         globals.IS_AUTHENTICATED = False
         globals.AUTH_USER = {}
 
-    def refresh_session():
+    def refresh_session(self):
         globals.AUTH_USER = auth.refresh(globals.AUTH_USER['refreshToken'])
 
     def reset_password(self, email):

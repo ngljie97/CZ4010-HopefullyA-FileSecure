@@ -1,5 +1,6 @@
 import os
 import socket
+from backend.controllers.data_controller import DataManager
 
 from backend.implementations.aescipher import AESCipher
 from backend.implementations.raid import Raid3Manager
@@ -13,6 +14,7 @@ def secure_send(input_file, enc_key):
 
     ## Splice and introduce redundancy - using RAID3 concepts
     filesize = os.path.getsize(input_file)
+    file_name = os.path.basename(input_file)
     raid = Raid3Manager(input_file=input_file, filesize=filesize)
     out_3paths = raid.compute_parity_hash()
 
@@ -26,10 +28,17 @@ def secure_send(input_file, enc_key):
     crypt.destroy()
     crypt = ''
 
+    ### Create database entry
+    db_controller = DataManager()
+    db_controller.insert_upload_entry(
+        user_id=globals.AUTH_USER['localId'],
+        file_name=file_name,
+        file_size=filesize,
+        display_name=globals.AUTH_USER['email'].split('@')[0])
+
     ## Send the file to the server from the queue, trx_q
     ### To be implemented (server should store userid, filesize, 3-part encrypted file)
 
-    ### Create database entry
     ### Send file to server for storage
 
     return 0
@@ -42,6 +51,8 @@ def secure_download(file_name, dest_dir):
     ### To be implemented
 
     ## Retrieve file information from database
+    db_controller = DataManager()
+    
     filesize = 199
     host_user = ''
     host_pubkey = ''
