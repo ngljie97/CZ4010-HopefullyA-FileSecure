@@ -1,10 +1,7 @@
 from backend import globals
-from backend.controllers.auth_controller import AuthManager
-from backend.controllers.data_controller import DataManager
-
+from backend.implementations import RSA
 globals.init()
-auth = AuthManager()
 
-auth.signin('abc@gmail.com', '123asd')
-
-idToken = globals.AUTH_USER['localId']
+list = generateKey()
+print(list)
+storePrivateKey(list[0],'test')

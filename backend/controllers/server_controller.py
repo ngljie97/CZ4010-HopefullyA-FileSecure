@@ -12,7 +12,7 @@ def start_server():
         data_chunk = ''
         conn, addr = s.accept()
         
-        file_name = 'test.txt' # retrieve from database
+        file_name = 'test.txt'.replace('.','_') # retrieve from database
         file_size = 0 # retrieve from database
         file = '\\' + file_name
         with conn:

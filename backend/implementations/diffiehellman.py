@@ -54,7 +54,7 @@ pkb = publicKey(b)
 shareKey1 = secretSharedKey(pkb,a)
 shareKey2 = secretSharedKey(pka,b)
 
-print(shareKey1)
-print(shareKey2)
+# print(shareKey1)
+# print(shareKey2)
 
         
