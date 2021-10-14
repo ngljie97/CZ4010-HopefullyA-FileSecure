@@ -29,6 +29,13 @@ pip3 install -r requirements.txt
 <br/>
 
 ## Changelog
+### V1.4:
+><ol>
+><li>User can now exchange file password (in plaintext for now. Encryption to be done with asymmetric encryption, tentatively RSA)</li>
+><li>Database entries now contains more information required for the file/password exchange.</li>
+><li>Added functionality of computing hash of the encryption key which will be stored in database. Required for validation.</li>
+></ol>
+
 ### V1.3:
 ><ol>
 ><li>Added data_controller for communication with Firebase database.</li>

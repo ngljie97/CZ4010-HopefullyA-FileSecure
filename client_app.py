@@ -1,6 +1,6 @@
+import time
 from backend import globals
 from backend.controllers.auth_controller import AuthManager
-from backend.controllers.client_controller import secure_download, secure_send
 from frontend import client_view as view
 
 globals.init()
@@ -26,6 +26,8 @@ while not globals.IS_AUTHENTICATED:
             print(auth.signin(email=email, password=password))
             email, password = (0, 0)
 
+            time.sleep(2)
+
             if globals.IS_AUTHENTICATED:
                 break
             else:
@@ -45,18 +47,16 @@ while globals.IS_AUTHENTICATED:
     option = view.user_menu()
 
     if option == '1':
-        file_location, passkey = view.upload_file_page()
-        secure_send(file_location, passkey)
-        input('Press enter to continue...')
+        view.upload_file_page()
 
     elif option == '2':
-        file_name, dest_dir = view.dwload_file_page()
-        secure_download(file_name, dest_dir)
-        input('Press enter to continue...')
+        view.request_file_page()
 
     elif option == '3':
-        #do something
-        print()
+        view.dwnl_reqst_page()
 
     elif option == '4':
+        view.dwload_file_page()
+
+    elif option == '5':
         auth.signout()

@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 
 from backend import globals
+from backend.implementations.aescipher import AESCipher
 # Database Controller class which manages the database operations.
 
 
@@ -17,7 +18,9 @@ class DataManager(object):
         file_size   :   Size of the original file.
     """
 
-    def insert_upload_entry(self, user_id, file_name, file_size, display_name):
+    def insert_upload_entry(self, user_id, file_name, file_size, display_name,
+                            hashedkey):
+
         # Current date time in local system.
         timestamp = datetime.now()
 
@@ -30,7 +33,8 @@ class DataManager(object):
             data = {
                 "filesize": file_size,
                 "display_name": display_name,
-                "timestamp": str(timestamp)
+                "timestamp": str(timestamp),
+                "hashed_key": hashedkey
             }
 
             db.child('UPLOAD').child(user_id).child(file_name).set(data)
@@ -49,39 +53,109 @@ class DataManager(object):
                                 file_size, remarks):
         # Current date time in local system.
         timestamp = datetime.now()
-
+        req_display_name = globals.AUTH_USER['email'].split('@')[0]
         file_name = file_name.replace('.', '_')
         if (self.entry_exist(uploader_id, file_name)):
             if self.entry_exist(user_id, file_name, uploader_id):
-                return 'DUPLICATE_REQUEST'
+                return 'Request was previously made, please check if it has already been approved.'
             else:
                 data = {
                     'uploader_id': uploader_id,
                     'file_size': file_size,
                     'timestamp': str(timestamp),
                     'remarks': remarks,
-                    'approval_status': False,
+                    'approval_status': 'WAITING',
+                    'req_display_name': req_display_name,
                     'exchange_secret': ''
                 }
 
                 db.child('DOWNLOAD').child(user_id).child(file_name).set(data)
 
-                return 'SUCCESS'
+                return 'Successfully requested for file. Please wait for the owner to approve.'
         else:
-            return 'FILE_NOT_FOUND'
+            return 'Requested file is no longer in the server.'
 
-    def approve_request():
-        return 0
+    def get_all_files(self):
 
-    def reject_request():
-        return 0
+        return db.child('UPLOAD').get().val()
 
-    def get_uploaded_files(user_id):
+    def get_uploaded_files(self, user_id):
 
-        return 0
+        return db.child('UPLOAD').child(user_id).get().val()
 
-    def get_requested_files():
-        return 0
+    def get_requested_files(self):
+
+        cur_user = globals.AUTH_USER['localId']
+        files = db.child('DOWNLOAD').child(cur_user).get().val()
+        return files
+
+    def get_file_requests(self):
+
+        cur_user = globals.AUTH_USER['localId']
+        entries = db.child('DOWNLOAD').get().val()
+
+        my_requests = []
+
+        for requester, requests in entries.items():
+            for file_name, request_info in requests.items():
+                if request_info['uploader_id'] == cur_user:
+                    my_requests.append({
+                        'requester':
+                        requester,
+                        'file_name':
+                        file_name,
+                        'remarks':
+                        request_info['remarks'],
+                        'req_display_name':
+                        request_info['req_display_name'],
+                        'uploader_id':
+                        request_info['uploader_id'],
+                        'approval_status':
+                        request_info['approval_status'],
+                        'exchange_secret':
+                        request_info['exchange_secret']
+                    })
+
+        return my_requests
+
+    def process_approval(self, request_info, approval, password):
+
+        file_hashed_pass = db.child('UPLOAD').child(
+            request_info['uploader_id']).child(
+                request_info['file_name']).child('hashed_key').get().val()
+
+        if approval:
+            cipher = AESCipher(password=password)
+            hashed_password = cipher.getKeyHash()
+
+            if (file_hashed_pass == hashed_password):
+                data = db.child('DOWNLOAD').child(
+                    request_info['requester']).child(
+                        request_info['file_name']).get().val()
+                data['approval_status'] = 'APPROVED'
+
+                ### Perform encryption of the password using asymetric key encryption using the requester public key (minimally)
+
+                # @Joel this portion needs your input
+
+                exchange_secret = password  # encrypt this 'password' @Joel
+
+                # ---------------------------------------------
+
+                data['exchange_secret'] = exchange_secret
+
+                db.child('DOWNLOAD').child(request_info['requester']).child(
+                    request_info['file_name']).update(data)
+
+                return 'APPROVED'
+            else:
+                return 'WRONG_PASSWORD'
+
+        else:
+            db.child('DOWNLOAD').child(request_info['requester']).child(
+                request_info['file_name']).child(
+                    request_info['approval_status']).update('REJECTED')
+            return 'REJECTED'
 
     def entry_exist(self, key_1, key_2, key_3=0):
 

@@ -1,4 +1,5 @@
 # cryptographic tools
+import hashlib
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA512
 from Crypto import Random
@@ -54,6 +55,12 @@ class AESCipher(object):
             f.write(data)
 
         return out_file
+
+    def getKeyHash(self):
+        hash_md5 = hashlib.md5()
+        hash_md5.update(self.key)
+        
+        return hash_md5.hexdigest()
 
 
 """ cipher = AESCipher('12345')
