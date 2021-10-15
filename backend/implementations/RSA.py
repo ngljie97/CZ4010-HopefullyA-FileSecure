@@ -7,8 +7,6 @@ from backend import globals as globals
 # from diffiehellman import publicKey
 import os
 
-private_key_dir = 'C:\\Users\\Joel Ng\Documents\\GitHub\\CZ4010\\CZ4010\\privatekey\\'
-private_key_dir2 = os.path.join('\Documents\\privatekey\\')
 pk_file_name = 'file name pk'
 # Generating key (Public key to be stored in database, private key stored in client machine)
 def generateKey():
@@ -31,9 +29,6 @@ def storePrivateKey(private_key, key_name):
         encryption_algorithm=serialization.NoEncryption())
     key_name = key_name +'.pem'
 
-    with open(private_key_dir + 'private_key.pem', 'wb') as f: 
-        f.write(pem)
-
     with open(globals.PROJ_ROOT + '\\privatekey\\' + key_name, 'wb') as x: 
         x.write(pem)
 
@@ -48,15 +43,15 @@ def storePublicKey(public_key):
         f.write(pem)
 
 
-# Reading keys
-def readPrivateKey():
-    with open("private_key.pem", "rb") as key_file:
+# Getting keys
+def getPrivateKey(key_name):
+    with open(globals.PROJ_ROOT + '\\privatekey\\' + key_name, "rb") as key_file:
         private_key = serialization.load_pem_private_key(
             key_file.read(), password=None, backend=default_backend())
     return private_key
 
 
-def readPublicKey():
+def getPublicKey():
     with open("public_key.pem", "rb") as key_file:
         public_key = serialization.load_pem_public_key(
             key_file.read(), backend=default_backend())
@@ -77,7 +72,7 @@ def encryptRSA(public_key, message):
 # Decrypt
 def decryptRSA(private_key, cipher_text):
     plain_text = private_key.decrypt(
-        encrypted,
+        cipher_text,
         padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()),
                      algorithm=hashes.SHA256(),
                      label=None))

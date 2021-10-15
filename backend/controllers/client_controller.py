@@ -55,6 +55,10 @@ def secure_send(input_file, enc_key):
         else:
             ## Send the file to the server from the queue, trx_q
             ### Send file to server for storage @Joel
+            s = socket.socket(socket.AF_NET, socket.SOCK_STREAM)
+            s.connect((socket.gethostname(), 1234)) # Using port 1234
+            for i in range(3):
+                s.send(f"{trx_q[i]}{SEPARATOR}{filesize}".encode())
 
             return 'Successfully uploaded file!'
     except:
