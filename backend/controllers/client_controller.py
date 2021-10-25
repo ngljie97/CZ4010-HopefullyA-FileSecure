@@ -1,11 +1,13 @@
 import os
 import socket
+import tqdm
 
 from backend.controllers.data_controller import DataManager
 
 from backend.implementations.aescipher import AESCipher
 from backend.implementations.raid import Raid3Manager
 from backend import globals
+from backend.globals import SERVER_IP, SERVER_PORT
 
 # Client - Basic functionalities
 
@@ -55,12 +57,33 @@ def secure_send(input_file, enc_key):
         else:
             ## Send the file to the server from the queue, trx_q
             ### Send file to server for storage @Joel
+            # Using trx_q[i] as file name
+            host = SERVER_IP
+            port =  SERVER_PORT
+            SEPARATOR = "<SEPARATOR>"
+            BUFFER_SIZE = 4096        
             s = socket.socket(socket.AF_NET, socket.SOCK_STREAM)
-            s.connect((socket.gethostname(), 1234)) # Using port 1234
+            print(f"[+] Attempting to connect to {host}:{port}")            
+            s.connect((host, port)) # Using port 1234
             for i in range(3):
                 s.send(f"{trx_q[i]}{SEPARATOR}{filesize}".encode())
-
+                progress = tqdm.tqdm(range(filesize), f"Sending {trx_q[i]}", unit="B", unit_scale=True, unit_divisor=1024)
+                with open(trx_q[i], "rb") as f:
+                    while True:
+                        # read the bytes from the file
+                        bytes_read = f.read(BUFFER_SIZE)
+                        if not bytes_read:
+                            # file transmitting is done
+                            break
+                        # we use sendall to assure transimission in 
+                        # busy networks
+                        s.sendall(bytes_read)
+                        # update the progress bar
+                        progress.update(len(bytes_read))                
+            # close the socket
+            s.close()
             return 'Successfully uploaded file!'
+            
     except:
         return 'Error occured!'
 

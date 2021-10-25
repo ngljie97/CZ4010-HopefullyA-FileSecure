@@ -44,6 +44,7 @@ requests-toolbelt==0.9.1
 rsa==4.7.2
 six==1.16.0
 toml==0.10.2
+tqdm==4.62.3
 urllib3==1.26.7
 Werkzeug==2.0.1
 yapf==0.31.0
