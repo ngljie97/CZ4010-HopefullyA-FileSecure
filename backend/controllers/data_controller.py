@@ -3,6 +3,7 @@ from datetime import datetime
 
 from backend import globals
 from backend.implementations.aescipher import AESCipher
+from backend.implementations.RSA import *
 # Database Controller class which manages the database operations.
 
 
@@ -66,7 +67,7 @@ class DataManager(object):
                     'remarks': remarks,
                     'approval_status': 'WAITING',
                     'req_display_name': req_display_name,
-                    'exchange_secret': ''
+                    'exchange_secret': '',
                 }
 
                 db.child('DOWNLOAD').child(user_id).child(file_name).set(data)
@@ -74,6 +75,13 @@ class DataManager(object):
                 return 'Successfully requested for file. Please wait for the owner to approve.'
         else:
             return 'Requested file is no longer in the server.'
+
+     # Insert public key
+    def insert_public_key(self, user_id, public_key):
+
+        db.child('PUBLICKEY').child(user_id).set(public_key)
+
+        return 1
 
     def get_all_files(self):
 
@@ -134,15 +142,18 @@ class DataManager(object):
                         request_info['file_name']).get().val()
                 data['approval_status'] = 'APPROVED'
 
-                ### Perform encryption of the password using asymetric key encryption using the requester public key (minimally)
+                # Perform encryption of the password using asymetric key encryption using the requester public key (minimally)
 
                 # @Joel this portion needs your input
-
-                exchange_secret = password  # encrypt this 'password' @Joel
+                public_key = db.child('PUBLICKEY').child(
+                    request_info['requester']).get().val()
+                public_key = bytes(public_key, 'utf-8')    
+                # encrypt this 'password' @Joel
+                exchange_secret = encryptRSA(public_key, password)
 
                 # ---------------------------------------------
 
-                data['exchange_secret'] = exchange_secret
+                data['exchange_secret'] = exchange_secret.hex()
 
                 db.child('DOWNLOAD').child(request_info['requester']).child(
                     request_info['file_name']).update(data)

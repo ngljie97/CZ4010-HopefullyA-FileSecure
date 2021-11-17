@@ -3,7 +3,6 @@
 
 import os
 import time
-
 from backend import globals
 from backend.controllers.client_controller import get_dwnls, get_all_files, FileMeta, request_download, get_file_requests, process_request, secure_download, secure_send
 

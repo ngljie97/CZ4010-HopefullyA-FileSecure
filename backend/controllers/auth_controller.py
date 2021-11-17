@@ -1,5 +1,9 @@
 import json
+from backend.controllers.data_controller import DataManager
+from backend.implementations.RSA import generatePublicKey
 from backend import globals
+
+# from backend.implementations import RSA
 
 
 class AuthManager(object):
@@ -11,12 +15,19 @@ class AuthManager(object):
         try:
             user = auth.create_user_with_email_and_password(email, password)
             # auth.send_email_verification(user['idToken'])
-
+            
         except Exception as e:
             error_json = e.args[1]
             error = json.loads(error_json)['error']
             return 'Sign up failed with error: ' + error['message']
-
+        try:
+            userid = user['localId']
+            public_key = generatePublicKey(userid)
+            db_controller = DataManager()
+            db_controller.insert_public_key(userid, public_key)
+        except Exception as e:
+            print(e)
+            
         return 'Succesfully created an account with ' + email
 
     def signin(self, email, password):
