@@ -140,7 +140,6 @@ def secure_download(file, dest_dir):
 
         # Receive 3 files from server to the dest_dir
         # To be implemented @Joel
-        file = os.path.join(dest_dir, file_name)
         request_type = "Download"
         host = globals.SERVER_IP
         port = globals.SERVER_PORT
@@ -155,23 +154,23 @@ def secure_download(file, dest_dir):
                 s.send(f"{request_type}{SEPARATOR}{file_name+'.p'+str(i)+'.enc'}{SEPARATOR}{filesize}".encode())
                 file_path = os.path.join(dest_dir,file_name+'.p'+str(i)+'.enc')
                 progress = tqdm.tqdm(range(
-                    filesize), f"Receiving {file_name+'.p'+str(i)+'.enc'}", unit="B", unit_scale=True, unit_divisor=1024)
+                    0), f"Receiving {file_name+'.p'+str(i)+'.enc'}", unit="B", unit_scale=True, unit_divisor=1024)
                 with open(file_path, "wb") as f:
-                    while True:
+                    # while True:
                         # read the bytes from the file
 
-                        bytes_read = s.recv(BUFFER_SIZE)
-                        if not bytes_read:
-                            # file transmitting is done
-                            break
-                        # we use sendall to assure transimission in
-                        # busy networks
-                        f.write(bytes_read)
-                        # update the progress bar
-                        progress.update(len(bytes_read))
+                    bytes_read = s.recv(BUFFER_SIZE)
+                        # if not bytes_read:
+                        #     # file transmitting is done
+                        #     break
+                        
+                    f.write(bytes_read)
+                    # update the progress bar
+                    progress.update(len(bytes_read))
+                s.send('success'.encode())
             # close the socket
         #     s.send()
-            s.close()
+            # s.close()
         # Exchange and decrypt the key for decryption
         key_name = globals.AUTH_USER['localId']
         dec_key = bytes.fromhex(file_infos['exchange_secret'])

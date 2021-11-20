@@ -32,6 +32,7 @@ def start_server():
                     request_type, file_name, file_size = data_receive.split(SEPARATOR)  # receive from client socket
 
                 else:
+                    # print(file_name)
                     print("Idk why the upload is delayed")
                     break
             except:
@@ -70,17 +71,15 @@ def start_server():
                 # if not reqFile:
                 #     break
                 # file_name = reqFile.decode()
-                
+                file_size = int(os.path.getsize(server_dir+file_name))
                 progress = tqdm.tqdm(range(
                     file_size), f"Sending {file_name}", unit="B", unit_scale=True, unit_divisor=1024)
                 with open(server_dir+file_name, 'rb') as f:
-                    # while True:
-                    for bytes_read in f:
-
-                        # bytes_read = f.read(BUFFER_SIZE)
-                        # if not bytes_read:
+                    while True:
+                        bytes_read = f.read(BUFFER_SIZE)
+                        if not bytes_read:
                             # file transmitting is done
-                            # break
+                            break
                         # we use sendall to assure transimission in
                         # busy networks
                         conn.sendall(bytes_read)
