@@ -72,10 +72,10 @@ def secure_send(input_file, enc_key):
                 s.connect((host, port))
 
                 # for i in trx_q:
-                while check=='success':
+                while True:
 
                     filesize = os.path.getsize(trx_q[i])
-                    if check:
+                    if check=='success':
                         check = 'fail'                        
                         s.send(f"{request_type}{SEPARATOR}{os.path.basename(trx_q[i])}{SEPARATOR}{filesize}".encode('utf-8'))
 
@@ -93,6 +93,7 @@ def secure_send(input_file, enc_key):
                                 s.sendall(bytes_read)
                                 # update the progress bar
                                 progress.update(len(bytes_read))
+                                
                         i+=1
 
                     if i>2:
