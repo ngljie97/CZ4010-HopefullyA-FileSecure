@@ -13,23 +13,34 @@ def start_server():
     BUFFER_SIZE = 4096
     SEPARATOR = "<SEPARATOR>"
     server_dir = 'C:\\CZ4010\\backend\\server\\'
+    i=0
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((SERVER_IP, SERVER_PORT))
         s.listen(10)  # A maximum queue of 10 unaccepted request
         print(f"[*] Listening as {SERVER_IP}:{SERVER_PORT}")
+        # receive file information
         conn, addr = s.accept()
         print(f"[+] {addr} is connected.")
         
+
         while True:
-            # receive file information
-            data_receive = conn.recv(BUFFER_SIZE).decode('utf-8')
-            if not data_receive:
-                break
-            request_type, file_name, file_size = data_receive.split(SEPARATOR)  # receive from client socket        
-           
+            try:
+                if i<3:
+                    data_receive = conn.recv(BUFFER_SIZE).decode('utf-8')
+                    if not data_receive:
+                        break
+                    request_type, file_name, file_size = data_receive.split(SEPARATOR)  # receive from client socket
+
+                else:
+                    print("Idk why the upload is delayed")
+                    break
+            except:
+                print('An error has occurred breaking out of while loop')     
+                break   
+        
 
             if (request_type == "Upload"):
-                 # remove absolute path to prevent exceptions
+                # remove absolute path to prevent exceptions
                 file_name = os.path.basename(file_name)
 
                 # convert file size to integer
@@ -43,18 +54,13 @@ def start_server():
                     progress = tqdm.tqdm(range(
                         file_size), f"Receiving {file_name}", unit="B", unit_scale=True, unit_divisor=1024)
                     with open(server_dir+file_name, "wb") as f:
-                        # while True:
-                            # read 1024 bytes from the socket (receive)
                         bytes_read = conn.recv(chunk_size)
-                        # if not bytes_read:
-                        #     # if nothing is received
-                        #     # file transmittion is complete
-                        #     break
                         # write to the file the bytes we just received
                         f.write(bytes_read)
                         # update the progress bar
                         progress.update(len(bytes_read))
                     file_size -= len(bytes_read)
+                    conn.send('success'.encode())
                     
                 f.close()
             
@@ -80,7 +86,9 @@ def start_server():
                         conn.sendall(bytes_read)
                         # update the progress bar
                         progress.update(len(bytes_read))
-                    
+            i+=1  
+        # conn.close()
+            
         # close the socket
         # conn.close()
         # s.close()

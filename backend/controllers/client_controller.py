@@ -64,35 +64,48 @@ def secure_send(input_file, enc_key):
             port = globals.SERVER_PORT
             SEPARATOR = "<SEPARATOR>"
             BUFFER_SIZE = 4096
-
+            check = 'success'
+            i=0
             # Creating client socket
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 print(f"[+] Attempting to send files to {host}:{port}")
                 s.connect((host, port))
 
-                for i in trx_q:
-                    filesize = os.path.getsize(i)
+                # for i in trx_q:
+                while check=='success':
 
-                    s.send(f"{request_type}{SEPARATOR}{os.path.basename(i)}{SEPARATOR}{filesize}".encode('utf-8'))
+                    filesize = os.path.getsize(trx_q[i])
+                    if check:
+                        check = 'fail'                        
+                        s.send(f"{request_type}{SEPARATOR}{os.path.basename(trx_q[i])}{SEPARATOR}{filesize}".encode('utf-8'))
 
-                    progress = tqdm.tqdm(range(
-                        filesize), f"Sending {os.path.basename(i)}", unit="B", unit_scale=True, unit_divisor=1024)
-                    with open(i, "rb") as f:
-                        while True:
-                            # read the bytes from the file
-                            bytes_read = f.read(BUFFER_SIZE)
-                            if not bytes_read:
-                                # file transmitting is done
-                                break
-                            # we use sendall to assure transimission in
-                            # busy networks                                                      
-                            s.sendall(bytes_read)
-                            # update the progress bar
-                            progress.update(len(bytes_read))
+                        progress = tqdm.tqdm(range(
+                            filesize), f"Sending {os.path.basename(trx_q[i])}", unit="B", unit_scale=True, unit_divisor=1024)
+                        with open(trx_q[i], "rb") as f:
+                            while True:
+                                # read the bytes from the file
+                                bytes_read = f.read(BUFFER_SIZE)
+                                if not bytes_read:
+                                    # file transmitting is done
+                                    break
+                                # we use sendall to assure transimission in
+                                # busy networks                                                      
+                                s.sendall(bytes_read)
+                                # update the progress bar
+                                progress.update(len(bytes_read))
+                        i+=1
 
-                # close the socket
-                # s.send()
-                s.close()
+                    if i>2:
+                        break
+                    else:
+                        try: 
+                            check = s.recv(1024).decode() 
+                        except:
+                            check = 'fail'                  
+
+                    # close the socket
+                    # s.send()
+                    # s.close()
             
             return 'Successfully uploaded file!'
 
