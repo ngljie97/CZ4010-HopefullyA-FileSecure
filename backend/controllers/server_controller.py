@@ -76,47 +76,30 @@ def start_server():
 
                 f.close()
 
-            elif (request_type == "Download"):
-                # reqFile = conn.recv(1024)
-                # if not reqFile:
-                #     break
-                # file_name = reqFile.decode()
-                if i>0:
-                    try:
-                        check = conn.recv(1024)
-                    except:
-                        print('check error')
-                        check = 'fail'  
-                else:
-                    check = 'success'
-                        
-                if (check=='success'):
-                    if i==0:
-                        check = conn.recv(1024)
-                    check = 'fail'
-                    dest_dir = os.path.join(server_dir, user_id)
-                    file_path = os.path.join(dest_dir, file_name)
-                    file_size = int(os.path.getsize(file_path))
-                    progress = tqdm.tqdm(range(file_size),
-                                        f"Sending {file_name}",
-                                        unit="B",
-                                        unit_scale=True,
-                                        unit_divisor=1024)
-                    with open(file_path, 'rb') as f:
-                        while True:
-                            bytes_read = f.read(BUFFER_SIZE)
-                            if not bytes_read:
-                                # file transmitting is done
-                                break
-                            # we use sendall to assure transimission in
-                            # busy networks
-                            conn.sendall(bytes_read)
-                            # update the progress bar
-                            progress.update(len(bytes_read))
-                    progress.close()
-                    f.close()
-                else:
-                    i-=1
+            elif (request_type == "Download"):               
+                dest_dir = os.path.join(server_dir, user_id)
+                file_path = os.path.join(dest_dir, file_name)
+                file_size = int(os.path.getsize(file_path))
+                progress = tqdm.tqdm(range(file_size),
+                                    f"Sending {file_name}",
+                                    unit="B",
+                                    unit_scale=True,
+                                    unit_divisor=1024)
+                with open(file_path, 'rb') as f:
+                    while True:
+                        bytes_read = f.read(BUFFER_SIZE)
+                        if not bytes_read:
+                            # file transmitting is done
+                            break
+                        # we use sendall to assure transimission in
+                        # busy networks
+                        conn.sendall(bytes_read)
+                        # update the progress bar
+                        progress.update(len(bytes_read))
+                progress.close()
+                conn.send('success'.encode())
+                f.close()
+                
             i += 1
         # conn.close()
 

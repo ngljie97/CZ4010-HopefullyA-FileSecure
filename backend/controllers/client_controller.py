@@ -142,14 +142,15 @@ def secure_download(file, dest_dir):
         port = globals.SERVER_PORT
         SEPARATOR = "<SEPARATOR>"
         BUFFER_SIZE = 4096
-
+        check = 'success'
         # Creating client socket
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             print(f"[+] Attempting to download files")
             s.connect((host, port))
             while True:
-                if i<4:
-                    s.sendall(
+                if check=='success':
+                    check = 'fail'
+                    s.send(
                         f"{request_type}{SEPARATOR}{uploader_id}{SEPARATOR}{file_name+'.p'+str(i)+'.enc'}{SEPARATOR}{filesize}"
                         .encode())
                     
@@ -172,12 +173,16 @@ def secure_download(file, dest_dir):
                         # update the progress bar
                         progress.update(len(bytes_read))
                     progress.close()
-                    f.close()
-                    s.sendall('success'.encode())
+                    f.close()                    
                     i+=1
-
-                else:                    
-                    break
+                if i > 3:
+                        break
+                else:
+                    try:
+                        check = s.recv(1024).decode()
+                    except:
+                        check = 'fail'
+                
             # close the socket
         #     s.send()
         # s.close()
