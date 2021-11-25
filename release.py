@@ -3,13 +3,14 @@
 import sys, os, shutil
 
 __arg_list = (sys.argv)[1:]
-__PROJ_ROOT = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
-__client_files = ['backend/controllers/auth_controller.py', 'backend/controllers/client_controller.py', 'backend/controllers/data_controller.py',\
-    'backend/implementations']
+__PROJ_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
 def _mkdir(path):
     if not os.path.exists(path):
+        os.makedirs(path)
+    else:
+        shutil.rmtree(path)
         os.makedirs(path)
 
 
@@ -25,6 +26,15 @@ def common_copy(working_dir):
     shutil.copyfile(src_file, dst_file)
 
 
+def zip_and_cleanup(type, working_dir):
+    shutil.make_archive(type, 'zip', working_dir)
+    shutil.rmtree(working_dir)
+
+
+if len(__arg_list) < 1:
+    print('Invalid arguments. One expected, "client" or "server"')
+    exit()
+
 if str(__arg_list[0]) == 'client':
     working_dir = os.path.join(__PROJ_ROOT, 'release', 'client_side')
     _mkdir(working_dir)
@@ -39,6 +49,7 @@ if str(__arg_list[0]) == 'client':
     print('copying client side codes for release...')
     src = os.path.join(__PROJ_ROOT, 'backend', 'controllers')
     dst = os.path.join(working_dir, 'backend', 'controllers')
+    _mkdir(dst)
     files = [
         'auth_controller.py', 'client_controller.py', 'data_controller.py'
     ]
@@ -53,6 +64,8 @@ if str(__arg_list[0]) == 'client':
     dst_file = os.path.join(working_dir, 'client_app.py')
     shutil.copyfile(src_file, dst_file)
 
+    zip_and_cleanup('client_release', working_dir)
+
 elif str(__arg_list[0]) == 'server':
     working_dir = os.path.join(__PROJ_ROOT, 'release', 'server_side')
     _mkdir(working_dir)
@@ -62,6 +75,7 @@ elif str(__arg_list[0]) == 'server':
     print('copying server side codes for release...')
     src = os.path.join(__PROJ_ROOT, 'backend', 'controllers')
     dst = os.path.join(working_dir, 'backend', 'controllers')
+    _mkdir(dst)
     files = ['server_controller.py', 'data_controller.py']
 
     for file in files:
@@ -73,3 +87,5 @@ elif str(__arg_list[0]) == 'server':
     src_file = os.path.join(__PROJ_ROOT, 'serverapp.py')
     dst_file = os.path.join(working_dir, 'serverapp.py')
     shutil.copyfile(src_file, dst_file)
+
+    zip_and_cleanup('server_release', working_dir)
