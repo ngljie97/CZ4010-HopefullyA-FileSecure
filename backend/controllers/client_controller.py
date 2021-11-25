@@ -11,6 +11,9 @@ from backend import globals
 
 globals.init()
 
+SEPARATOR = "<||>"
+BUFFER_SIZE = 4096
+
 
 class FileMeta(object):
     def __init__(self):
@@ -59,133 +62,122 @@ def secure_send(input_file, enc_key):
             # Send file to server for storage @Joel
             # Using trx_q[i] as file name
             request_type = "Upload"
-            host = globals.SERVER_IP
-            port = globals.SERVER_PORT
-            SEPARATOR = "<SEPARATOR>"
-            BUFFER_SIZE = 4096
-            check = 'success'
-            i = 0
+
             # Creating client socket
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                print(f"[+] Attempting to send files to {host}:{port}")
-                s.connect((host, port))
+                print(
+                    f"[+] Attempting to send files to {globals.SERVER_IP}:{globals.SERVER_PORT}"
+                )
+                s.connect((globals.SERVER_IP, globals.SERVER_PORT))
 
-                while True:
+                for file in trx_q:
+                    user_id = globals.AUTH_USER['localId']
+                    file_name = os.path.basename(file)
+                    file_size = os.path.getsize(file)
 
-                    filesize = os.path.getsize(trx_q[i])
-                    if check=='success':
-                        check = 'fail'                        
-                        s.send(f"{request_type}{SEPARATOR}{globals.AUTH_USER['localId']}{SEPARATOR}{os.path.basename(trx_q[i])}{SEPARATOR}{filesize}".encode('utf-8'))
+                    s.send(
+                        f"{request_type}{SEPARATOR}{user_id}{SEPARATOR}{file_name}{SEPARATOR}{file_size}"
+                        .encode())
 
-                        progress = tqdm.tqdm(range(
-                            filesize), f"Sending {os.path.basename(trx_q[i])}", unit="B", unit_scale=True, unit_divisor=1024)
-                        with open(trx_q[i], "rb") as f:
-                            while True:
-                                # read the bytes from the file
-                                bytes_read = f.read(BUFFER_SIZE)
-                                if not bytes_read:
-                                    # file transmitting is done
-                                    break
+                    status = ''
+                    while (status != 'READY'):
+                        status = s.recv(5).decode()
 
-                                # we use sendall to assure transimission in
-                                # busy networks
-                                s.sendall(bytes_read)
-                                # update the progress bar
-                                progress.update(len(bytes_read))
-                            progress.close()
-                    if i > 2:
-                        break
-                    else:
-                        try:
-                            check = s.recv(1024).decode()
-                        except:
-                            check = 'fail'
-                    i += 1
-                    # close the socket
-                    # s.send()
-                    # s.close()
+                    progress = tqdm.tqdm(range(file_size),
+                                         f"Sending {file_name}",
+                                         unit="B",
+                                         unit_scale=True,
+                                         unit_divisor=1024)
 
-            return 'Successfully uploaded file!'
+                    with open(file, "rb") as f:
 
+                        bytes_left = file_size
+                        while bytes_left > 0:
+                            # read data sent over
+                            if (bytes_left < BUFFER_SIZE):
+                                to_read = bytes_left
+                            else:
+                                to_read = BUFFER_SIZE
+
+                            bytes_read = f.read(to_read)
+                            bytes_left -= to_read
+
+                            # send data to server
+                            s.sendall(bytes_read)
+
+                            # update the progress bar
+                            progress.update(len(bytes_read))
+                        progress.close()
+
+                    del_file(file)
+                s.send(f"Exit{SEPARATOR}0{SEPARATOR}0{SEPARATOR}0".encode())
+
+        return 'Successfully uploaded file!'
     except:
         return 'Error occured!'
-
-
-def request_download(file_meta):
-
-    # Insert the download request to database.
-    db_controller = DataManager()
-    status = db_controller.insert_download_request(
-        user_id=globals.AUTH_USER['localId'],
-        file_name=file_meta.file_name,
-        file_size=file_meta.file_size,
-        remarks=file_meta.remarks,
-        uploader_id=file_meta.uploader_id)
-
-    return status
 
 
 # Download the file, file_name, from server to chosen directory, dest_dir.
 def secure_download(file, dest_dir):
     try:
-        db_controller = DataManager()
-        i=1
         file_name, file_infos = file
 
         file_name = file_name[:-4] + '.' + file_name[-3:]
         filesize = file_infos['file_size']
         uploader_id = file_infos['uploader_id']
+
         # Receive 3 files from server to the dest_dir
-        # To be implemented @Joel
         request_type = "Download"
-        host = globals.SERVER_IP
-        port = globals.SERVER_PORT
-        SEPARATOR = "<SEPARATOR>"
-        BUFFER_SIZE = 4096
-        check = 'success'
+
         # Creating client socket
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            print(f"[+] Attempting to download files")
-            s.connect((host, port))
-            while True:
-                if check=='success':
-                    check = 'fail'
-                    s.send(
-                        f"{request_type}{SEPARATOR}{uploader_id}{SEPARATOR}{file_name+'.p'+str(i)+'.enc'}{SEPARATOR}{filesize}"
-                        .encode())
-                    
-                    file_path = os.path.join(dest_dir,
-                                            file_name + '.p' + str(i) + '.enc')
-                    progress = tqdm.tqdm(
-                        range(0),
-                        f"Receiving {file_name+'.p'+str(i)+'.enc'}",
-                        unit="B",
-                        unit_scale=True,
-                        unit_divisor=1024)
-                    with open(file_path, "wb") as f:
-                        # while True:
-                        # # read the bytes from the file
-                        bytes_read = s.recv(BUFFER_SIZE)
-                        # if not bytes_read:
-                        #     # file transmitting is done
-                        #     break
+            print(
+                f"[+] Attempting to download files from {globals.SERVER_IP}:{globals.SERVER_PORT}"
+            )
+            s.connect((globals.SERVER_IP, globals.SERVER_PORT))
+
+            for part_no in range(1, 4):
+                part_name = file_name + '.p' + str(part_no) + '.enc'
+
+                s.send(
+                    f"{request_type}{SEPARATOR}{uploader_id}{SEPARATOR}{part_name}{SEPARATOR}{0}"
+                    .encode())
+
+                file_size = 0
+                while (file_size == 0):
+                    file_size = int(s.recv(10).decode())
+
+                progress = tqdm.tqdm(range(file_size),
+                                     f"Receiving {part_name}",
+                                     unit="B",
+                                     unit_scale=True,
+                                     unit_divisor=1024)
+
+                dest_file = os.path.join(dest_dir, part_name)
+
+                with open(dest_file, "wb", buffering=0) as f:
+
+                    bytes_left = file_size
+                    while bytes_left > 0:
+                        # read data sent over
+                        if (bytes_left < BUFFER_SIZE):
+                            to_read = bytes_left
+                        else:
+                            to_read = BUFFER_SIZE
+
+                        bytes_read = s.recv(to_read)
+                        bytes_left -= to_read
+
+                        # write to the file the bytes we just received
                         f.write(bytes_read)
+
                         # update the progress bar
                         progress.update(len(bytes_read))
                     progress.close()
-                    f.close()                    
-                    i+=1
-                if i > 3:
-                        break
-                else:
-                    try:
-                        check = s.recv(1024).decode()
-                    except:
-                        check = 'fail'
-                
+
             # close the socket
-        #     s.send()
-        # s.close()
+            s.send(f"Exit{SEPARATOR}0{SEPARATOR}0{SEPARATOR}0".encode())
+
         # Exchange and decrypt the key for decryption
         key_name = globals.AUTH_USER['localId']
         dec_key = bytes.fromhex(file_infos['exchange_secret'])
@@ -208,10 +200,26 @@ def secure_download(file, dest_dir):
         raid = Raid3Manager(filesize=filesize, input_file=file_p1)
         raid.check_and_construct()
 
+        for i in range(1, 4):
+            del_file(file + '.p' + str(i))
+
         return 'Successfully downloaded file!'
 
     except:
         return 'Error occured downloading file.'
+
+
+def request_download(file_meta):
+    # Insert the download request to database.
+    db_controller = DataManager()
+    status = db_controller.insert_download_request(
+        user_id=globals.AUTH_USER['localId'],
+        file_name=file_meta.file_name,
+        file_size=file_meta.file_size,
+        remarks=file_meta.remarks,
+        uploader_id=file_meta.uploader_id)
+
+    return status
 
 
 def get_all_files():

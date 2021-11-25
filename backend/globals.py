@@ -9,15 +9,13 @@ def init():
     global AUTH_USER
     global SERVER_IP
     global SERVER_PORT
-    global SERVER_ROOT
     global IS_AUTHENTICATED
     global MAX_LOGIN_ATTEMPTS
     global FIREBASE_CONN
 
     ## ==================Change this section to your own configurations ============================
-    SERVER_IP = '192.168.99.121'
+    SERVER_IP = '192.168.109.196'
     SERVER_PORT = 65432
-    SERVER_ROOT = '/home/cz4010fs'
     ## ======================End of section to be editted===========================================
 
     # The following variables do not have to be changed. Do it at your own risk!

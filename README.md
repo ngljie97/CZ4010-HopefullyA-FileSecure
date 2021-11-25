@@ -29,12 +29,22 @@ pip3 install -r requirements.txt
 <br/>
 
 ## Changelog
+
+### V1.0.0
+><ol>
+><li>Uploading and downloading of file completed.</li>
+><li>Removed release script. Server-side app is now self contained into one single python file.</li>
+><li>Code clean up.</li>
+><li>Removed unused files and folders.</li>
+></ol>
+
 ### V0.2.0
 ><ol>
 ><li>Sending and downloading file was previously added by Joel</li>
 ><li>Added release script (release.py) which will copy files for server and client release respectively into the release folder.</li>
 ><li>Other bug fixes here and there.</li>
 ></ol>
+
 ### V0.1.4:
 ><ol>
 ><li>User can now exchange file password (in plaintext for now. Encryption to be done with asymmetric encryption, tentatively RSA)</li>
