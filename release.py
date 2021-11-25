@@ -25,6 +25,10 @@ def common_copy(working_dir):
     dst_file = os.path.join(working_dir, 'backend', 'globals.py')
     shutil.copyfile(src_file, dst_file)
 
+    src = os.path.join(__PROJ_ROOT, 'backend', 'secret')
+    dst = os.path.join(working_dir, 'backend', 'secret')
+    shutil.copytree(src, dst)
+
 
 def zip_and_cleanup(type, working_dir):
     shutil.make_archive(type, 'zip', working_dir)
