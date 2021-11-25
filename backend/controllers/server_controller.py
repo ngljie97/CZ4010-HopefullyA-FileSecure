@@ -27,7 +27,7 @@ def start_server():
                     data_receive = conn.recv(BUFFER_SIZE).decode('utf-8')
                     if not data_receive:
                         break
-                    request_type, file_name, file_size = data_receive.split(
+                    request_type, user_id, file_name, file_size = data_receive.split(
                         SEPARATOR)  # receive from client socket
 
                 else:
@@ -55,13 +55,19 @@ def start_server():
                                          unit="B",
                                          unit_scale=True,
                                          unit_divisor=1024)
-                                         
-                    with open(server_dir + file_name, "wb") as f:
+
+                    dest_dir = os.path.join(server_dir, user_id)
+
+                    if not os.path.exists(dest_dir):
+                        os.makedirs(dest_dir)
+
+                    with open(os.path.join(dest_dir, file_name), "wb") as f:
                         bytes_read = conn.recv(chunk_size)
                         # write to the file the bytes we just received
                         f.write(bytes_read)
                         # update the progress bar
                         progress.update(len(bytes_read))
+
                     file_size -= len(bytes_read)
                     conn.send('success'.encode())
 

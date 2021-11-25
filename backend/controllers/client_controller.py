@@ -85,19 +85,12 @@ def secure_send(input_file, enc_key):
                 while True:
 
                     filesize = os.path.getsize(trx_q[i])
-                    if check == 'success':
-                        check = 'fail'
-                        s.send(
-                            f"{request_type}{SEPARATOR}{os.path.basename(trx_q[i])}{SEPARATOR}{filesize}"
-                            .encode('utf-8'))
+                    if check=='success':
+                        check = 'fail'                        
+                        s.send(f"{request_type}{SEPARATOR}{globals.AUTH_USER['localId']}{SEPARATOR}{os.path.basename(trx_q[i])}{SEPARATOR}{filesize}".encode('utf-8'))
 
-                        progress = tqdm.tqdm(
-                            range(filesize),
-                            f"Sending {os.path.basename(trx_q[i])}",
-                            unit="B",
-                            unit_scale=True,
-                            unit_divisor=1024)
-
+                        progress = tqdm.tqdm(range(
+                            filesize), f"Sending {os.path.basename(trx_q[i])}", unit="B", unit_scale=True, unit_divisor=1024)
                         with open(trx_q[i], "rb") as f:
                             while True:
                                 # read the bytes from the file
