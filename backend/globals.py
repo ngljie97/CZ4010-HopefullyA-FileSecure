@@ -15,9 +15,9 @@ def init():
     global FIREBASE_CONN
 
     ## ==================Change this section to your own configurations ============================
-    SERVER_IP = '192.168.99.121'
+    SERVER_IP = '127.0.0.1'
     SERVER_PORT = 65432
-    SERVER_ROOT = '/home/cz4010fs/'
+    SERVER_ROOT = 'C:\\CZ4010\\'
     ## ======================End of section to be editted===========================================
 
     # The following variables do not have to be changed. Do it at your own risk!

@@ -82,14 +82,17 @@ def start_server():
                 #     break
                 # file_name = reqFile.decode()
                 if i>0:
-                        check = 'success'
-                else:
                     try:
                         check = conn.recv(1024)
                     except:
                         print('check error')
-                        check = 'fail'
+                        check = 'fail'  
+                else:
+                    check = 'success'
+                        
                 if (check=='success'):
+                    if i==0:
+                        check = conn.recv(1024)
                     check = 'fail'
                     dest_dir = os.path.join(server_dir, user_id)
                     file_path = os.path.join(dest_dir, file_name)
