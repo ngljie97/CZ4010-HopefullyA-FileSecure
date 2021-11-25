@@ -1,6 +1,8 @@
 from backend import globals
 import os, tqdm, socket
 
+from backend.controllers import server_controller
+
 globals.init()
 
 BUFFER_SIZE = 4096
@@ -9,88 +11,92 @@ SEPARATOR = "<SEPARATOR>"
 if not os.path.exists(globals.SERVER_ROOT):
     os.makedirs(globals.SERVER_ROOT)
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    try:
-        s.bind((globals.SERVER_IP, globals.SERVER_PORT))
-        s.listen(10)  # A maximum queue of 10 unaccepted request
-        print(
-            f"[*] Server started @ {globals.SERVER_IP}:{globals.SERVER_PORT}")
+server_controller.start_server()
 
-    except KeyboardInterrupt:
-        s.close()
+# with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+#     try:
+#         s.bind((globals.SERVER_IP, globals.SERVER_PORT))
+#         s.listen(10)  # A maximum queue of 10 unaccepted request
+#         print(
+#             f"[*] Server started @ {globals.SERVER_IP}:{globals.SERVER_PORT}")
 
-    while (True):
-        conn, addr = s.accept()
-        print(f"[+] {addr} has connected.")
+#     except KeyboardInterrupt:
+#         s.detach()
+#         s.shutdown()
+#         s.close()
 
-        for i in range(0, 3):
+#     while (True):
+#         conn, addr = s.accept()
+#         print(f"[+] {addr} has connected.")
 
-            data_receive = ''
+#         for i in range(0, 3):
 
-            while (True):
-                data_receive += conn.recv(BUFFER_SIZE).decode('utf-8')
-                if not data_receive:
-                    break
+#             data_receive = ''
 
-            # receive from client socket
-            request_type, user_id, file_name, file_size = data_receive.split(
-                SEPARATOR)
-            file_name = os.path.basename(file_name)
-            # convert file size to integer
-            file_size = int(file_size)
+#             while (True):
+#                 data_receive += conn.recv(BUFFER_SIZE).decode('utf-8')
+#                 if not data_receive:
+#                     break
 
-            if (request_type == "Upload"):
-                progress = tqdm.tqdm(range(file_size),
-                                     f"Receiving {file_name}",
-                                     unit="B",
-                                     unit_scale=True,
-                                     unit_divisor=1024)
+#             # receive from client socket
+#             request_type, user_id, file_name, file_size = data_receive.split(
+#                 SEPARATOR)
+#             file_name = os.path.basename(file_name)
+#             # convert file size to integer
+#             file_size = int(file_size)
 
-                dest_dir = os.path.join(globals.SERVER_ROOT, user_id)
-                if not os.path.exists(dest_dir):
-                    os.makedirs(dest_dir)
-                bytes_read = ''
-                with open(os.path.join(dest_dir, file_name), "wb") as f:
-                    while (True):
-                        # read data sent over
-                        bytes_read = conn.recv(BUFFER_SIZE)
-                        if not bytes_read:
-                            break
+#             if (request_type == "Upload"):
+#                 progress = tqdm.tqdm(range(file_size),
+#                                      f"Receiving {file_name}",
+#                                      unit="B",
+#                                      unit_scale=True,
+#                                      unit_divisor=1024)
 
-                        # write to the file the bytes we just received
-                        f.write(bytes_read)
+#                 dest_dir = os.path.join(globals.SERVER_ROOT, user_id)
+#                 if not os.path.exists(dest_dir):
+#                     os.makedirs(dest_dir)
+#                 bytes_read = ''
+#                 with open(os.path.join(dest_dir, file_name), "wb") as f:
+#                     while (True):
+#                         # read data sent over
+#                         bytes_read = conn.recv(BUFFER_SIZE)
+#                         if not bytes_read:
+#                             break
 
-                        # update the progress bar
-                        progress.update(len(bytes_read))
-                    progress.close()
-                f.close()
-                conn.send('success'.encode())
+#                         # write to the file the bytes we just received
+#                         f.write(bytes_read)
 
-            elif (request_type == "Download"):
-                progress = tqdm.tqdm(range(file_size),
-                                     f"Sending {file_name}",
-                                     unit="B",
-                                     unit_scale=True,
-                                     unit_divisor=1024)
+#                         # update the progress bar
+#                         progress.update(len(bytes_read))
+#                     progress.close()
+#                 f.close()
+#                 conn.send('success'.encode())
 
-                dest_dir = os.path.join(globals.SERVER_ROOT, user_id)
-                file_path = os.path.join(dest_dir, file_name)
-                file_size = int(os.path.getsize(file_path))
-                bytes_read = ''
-                with open(file_path, 'rb') as f:
-                    while True:
-                        bytes_read = f.read(BUFFER_SIZE)
+#             elif (request_type == "Download"):
+#                 progress = tqdm.tqdm(range(file_size),
+#                                      f"Sending {file_name}",
+#                                      unit="B",
+#                                      unit_scale=True,
+#                                      unit_divisor=1024)
 
-                        # file transmitting is done
-                        if not bytes_read:
-                            break
+#                 dest_dir = os.path.join(globals.SERVER_ROOT, user_id)
+#                 file_path = os.path.join(dest_dir, file_name)
+#                 file_size = int(os.path.getsize(file_path))
+#                 bytes_read = ''
+#                 with open(file_path, 'rb') as f:
+#                     while True:
+#                         bytes_read = f.read(BUFFER_SIZE)
 
-                        # we use sendall to assure transimission in
-                        # busy networks
-                        conn.sendall(bytes_read)
-                        # update the progress bar
-                        progress.update(len(bytes_read))
-                    progress.close()
-                f.close()
+#                         # file transmitting is done
+#                         if not bytes_read:
+#                             break
 
-        conn.close
+#                         # we use sendall to assure transimission in
+#                         # busy networks
+#                         conn.sendall(bytes_read)
+#                         # update the progress bar
+#                         progress.update(len(bytes_read))
+#                     progress.close()
+#                 f.close()
+
+#         conn.close
