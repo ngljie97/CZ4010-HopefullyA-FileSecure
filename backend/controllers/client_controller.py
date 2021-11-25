@@ -72,6 +72,16 @@ def secure_send(input_file, enc_key):
                 s.connect((host, port))
 
                 # for i in trx_q:
+                for file in trx_q:
+                    requester = globals.AUTH_USER['localId']
+                    filename = os.path.basename(file)
+                    filesize = os.path.getsize(file)
+
+                    s.send(
+                            f"{request_type}{SEPARATOR}{filename}{SEPARATOR}{filesize}"
+                            .encode('utf-8'))
+
+
                 while True:
 
                     filesize = os.path.getsize(trx_q[i])
@@ -87,6 +97,7 @@ def secure_send(input_file, enc_key):
                             unit="B",
                             unit_scale=True,
                             unit_divisor=1024)
+
                         with open(trx_q[i], "rb") as f:
                             while True:
                                 # read the bytes from the file

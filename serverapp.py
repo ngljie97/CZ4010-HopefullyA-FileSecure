@@ -4,7 +4,7 @@ import os
 
 globals.init()
 
-server_dir = 'C:\\CZ4010\\backend\\server\\'
+server_dir = globals.SERVER_ROOT
 if not os.path.exists(server_dir):
     os.makedirs(server_dir)
 
