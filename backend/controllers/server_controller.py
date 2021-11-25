@@ -17,23 +17,25 @@ def start_server():
         s.bind((SERVER_IP, SERVER_PORT))
         s.listen(10)  # A maximum queue of 10 unaccepted request
         print(f"[*] Listening as {SERVER_IP}:{SERVER_PORT}")
-        # receive file information
+        # receive file information        
         conn, addr = s.accept()
         print(f"[+] {addr} is connected.")
 
         while True:
             try:
+                
                 if i < 3:
                     data_receive = conn.recv(BUFFER_SIZE).decode('utf-8')
                     if not data_receive:
                         break
                     request_type, user_id, file_name, file_size = data_receive.split(
                         SEPARATOR)  # receive from client socket
-
                 else:
-                    # print(file_name)
-                    print("Idk why the upload is delayed")
+                    # print(file_name)     
+                    conn.close()               
                     break
+                
+                
             except:
                 print('An error has occurred breaking out of while loop')
                 break
@@ -67,6 +69,7 @@ def start_server():
                         f.write(bytes_read)
                         # update the progress bar
                         progress.update(len(bytes_read))
+                    progress.close()
 
                     file_size -= len(bytes_read)
                     conn.send('success'.encode())
@@ -78,23 +81,39 @@ def start_server():
                 # if not reqFile:
                 #     break
                 # file_name = reqFile.decode()
-                file_size = int(os.path.getsize(server_dir + file_name))
-                progress = tqdm.tqdm(range(file_size),
-                                     f"Sending {file_name}",
-                                     unit="B",
-                                     unit_scale=True,
-                                     unit_divisor=1024)
-                with open(server_dir + file_name, 'rb') as f:
-                    while True:
-                        bytes_read = f.read(BUFFER_SIZE)
-                        if not bytes_read:
-                            # file transmitting is done
-                            break
-                        # we use sendall to assure transimission in
-                        # busy networks
-                        conn.sendall(bytes_read)
-                        # update the progress bar
-                        progress.update(len(bytes_read))
+                if i>0:
+                        check = 'success'
+                else:
+                    try:
+                        check = conn.recv(1024)
+                    except:
+                        print('check error')
+                        check = 'fail'
+                if (check=='success'):
+                    check = 'fail'
+                    dest_dir = os.path.join(server_dir, user_id)
+                    file_path = os.path.join(dest_dir, file_name)
+                    file_size = int(os.path.getsize(file_path))
+                    progress = tqdm.tqdm(range(file_size),
+                                        f"Sending {file_name}",
+                                        unit="B",
+                                        unit_scale=True,
+                                        unit_divisor=1024)
+                    with open(file_path, 'rb') as f:
+                        while True:
+                            bytes_read = f.read(BUFFER_SIZE)
+                            if not bytes_read:
+                                # file transmitting is done
+                                break
+                            # we use sendall to assure transimission in
+                            # busy networks
+                            conn.sendall(bytes_read)
+                            # update the progress bar
+                            progress.update(len(bytes_read))
+                    progress.close()
+                    f.close()
+                else:
+                    i-=1
             i += 1
         # conn.close()
 
