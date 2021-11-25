@@ -29,7 +29,7 @@ def start_server():
                     data_receive = conn.recv(BUFFER_SIZE).decode('utf-8')
                     if not data_receive:
                         break
-                    request_type, file_name, file_size = data_receive.split(SEPARATOR)  # receive from client socket
+                    request_type, user_id, file_name, file_size = data_receive.split(SEPARATOR)  # receive from client socket
 
                 else:
                     # print(file_name)
@@ -54,7 +54,7 @@ def start_server():
                     # and writing to the file stream
                     progress = tqdm.tqdm(range(
                         file_size), f"Receiving {file_name}", unit="B", unit_scale=True, unit_divisor=1024)
-                    with open(server_dir+file_name, "wb") as f:
+                    with open(server_dir+user_id+"\\"+file_name, "wb") as f:
                         bytes_read = conn.recv(chunk_size)
                         # write to the file the bytes we just received
                         f.write(bytes_read)
