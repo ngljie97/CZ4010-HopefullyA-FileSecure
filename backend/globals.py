@@ -27,11 +27,6 @@ def init():
     MAX_LOGIN_ATTEMPTS = 3
     AUTH_USER = {}
     IS_AUTHENTICATED = False
-    SERVER_IP = '127.0.0.1'
-    SERVER_PORT = 65432
-    SERVER_ROOT = 'C:\\CZ4010\\'
-    # '/home/cz4010fs/'
-
     FIREBASE_CONN = pyrebase.initialize_app({
         "apiKey": "AIzaSyBd9GRTbL_lIZyJtpQkUfvGwfXmzwuDszc",
         "authDomain": "cz4010fs.firebaseapp.com",
