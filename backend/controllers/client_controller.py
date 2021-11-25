@@ -65,7 +65,7 @@ def secure_send(input_file, enc_key):
             SEPARATOR = "<SEPARATOR>"
             BUFFER_SIZE = 4096
             check = 'success'
-            i=0
+            i = 0
             # Creating client socket
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 print(f"[+] Attempting to send files to {host}:{port}")
@@ -75,12 +75,18 @@ def secure_send(input_file, enc_key):
                 while True:
 
                     filesize = os.path.getsize(trx_q[i])
-                    if check=='success':
-                        check = 'fail'                        
-                        s.send(f"{request_type}{SEPARATOR}{os.path.basename(trx_q[i])}{SEPARATOR}{filesize}".encode('utf-8'))
+                    if check == 'success':
+                        check = 'fail'
+                        s.send(
+                            f"{request_type}{SEPARATOR}{os.path.basename(trx_q[i])}{SEPARATOR}{filesize}"
+                            .encode('utf-8'))
 
-                        progress = tqdm.tqdm(range(
-                            filesize), f"Sending {os.path.basename(trx_q[i])}", unit="B", unit_scale=True, unit_divisor=1024)
+                        progress = tqdm.tqdm(
+                            range(filesize),
+                            f"Sending {os.path.basename(trx_q[i])}",
+                            unit="B",
+                            unit_scale=True,
+                            unit_divisor=1024)
                         with open(trx_q[i], "rb") as f:
                             while True:
                                 # read the bytes from the file
@@ -89,25 +95,25 @@ def secure_send(input_file, enc_key):
                                     # file transmitting is done
                                     break
                                 # we use sendall to assure transimission in
-                                # busy networks                                                      
+                                # busy networks
                                 s.sendall(bytes_read)
                                 # update the progress bar
                                 progress.update(len(bytes_read))
-                                
-                        i+=1
 
-                    if i>2:
+                        i += 1
+
+                    if i > 2:
                         break
                     else:
-                        try: 
-                            check = s.recv(1024).decode() 
+                        try:
+                            check = s.recv(1024).decode()
                         except:
-                            check = 'fail'                  
+                            check = 'fail'
 
                     # close the socket
                     # s.send()
                     # s.close()
-            
+
             return 'Successfully uploaded file!'
 
     except:
@@ -151,26 +157,33 @@ def secure_download(file, dest_dir):
             print(f"[+] Attempting to download files")
             s.connect((host, port))
             for i in range(1, 4):
-                s.send(f"{request_type}{SEPARATOR}{file_name+'.p'+str(i)+'.enc'}{SEPARATOR}{filesize}".encode())
-                file_path = os.path.join(dest_dir,file_name+'.p'+str(i)+'.enc')
-                progress = tqdm.tqdm(range(
-                    0), f"Receiving {file_name+'.p'+str(i)+'.enc'}", unit="B", unit_scale=True, unit_divisor=1024)
+                s.send(
+                    f"{request_type}{SEPARATOR}{file_name+'.p'+str(i)+'.enc'}{SEPARATOR}{filesize}"
+                    .encode())
+                file_path = os.path.join(dest_dir,
+                                         file_name + '.p' + str(i) + '.enc')
+                progress = tqdm.tqdm(
+                    range(0),
+                    f"Receiving {file_name+'.p'+str(i)+'.enc'}",
+                    unit="B",
+                    unit_scale=True,
+                    unit_divisor=1024)
                 with open(file_path, "wb") as f:
                     # while True:
-                        # read the bytes from the file
+                    # read the bytes from the file
 
                     bytes_read = s.recv(BUFFER_SIZE)
-                        # if not bytes_read:
-                        #     # file transmitting is done
-                        #     break
-                        
+                    # if not bytes_read:
+                    #     # file transmitting is done
+                    #     break
+
                     f.write(bytes_read)
                     # update the progress bar
                     progress.update(len(bytes_read))
                 s.send('success'.encode())
             # close the socket
         #     s.send()
-            # s.close()
+        # s.close()
         # Exchange and decrypt the key for decryption
         key_name = globals.AUTH_USER['localId']
         dec_key = bytes.fromhex(file_infos['exchange_secret'])
