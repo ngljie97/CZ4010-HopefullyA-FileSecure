@@ -1,8 +1,8 @@
 import os, tqdm, socket
 
-SERVER_IP = '0.0.0.0'
 SERVER_PORT = 65432
 SERVER_ROOT = '/home/cz4010fs'
+SERVER_IP = '0.0.0.0'
 BUFFER_SIZE = 4096
 SEPARATOR = "<||>"
 

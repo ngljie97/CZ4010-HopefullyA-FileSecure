@@ -7,8 +7,14 @@
 Project: Secure File-Sharing platform with untrusted Intermediary
 
 ## Getting started
+- Setting up the server
+  - Navigate to \server_side and copy the contents to your desired location in the server machine (file sharing host).
+  - Modify 'SERVER_PORT' and 'SERVER_ROOT' to fit your needs.
 
-<- to be added next time ->
+- Running the client (from project root)
+  ```
+  python3 client_app.py
+  ```
 
 #### Directory stucture
 - backend\  : containing code of all the program logic and solutions.
@@ -22,7 +28,11 @@ pip3 freeze > requirements.txt
 ```
 #### Installing project dependencies
 ```
+# for client
 pip3 install -r requirements.txt
+
+# for server
+pip3 install -r server_dependency.txt
 ```
 <br/>
 <hr/>
