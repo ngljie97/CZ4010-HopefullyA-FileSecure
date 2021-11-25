@@ -6,7 +6,6 @@ from backend.implementations.RSA import decryptRSA
 from backend.implementations.aescipher import AESCipher
 from backend.implementations.raid import Raid3Manager
 from backend import globals
-# from backend.globals import SERVER_IP, SERVER_PORT
 
 # Client - Basic functionalities
 
@@ -71,17 +70,6 @@ def secure_send(input_file, enc_key):
                 print(f"[+] Attempting to send files to {host}:{port}")
                 s.connect((host, port))
 
-                # for i in trx_q:
-                # for file in trx_q:
-                #     requester = globals.AUTH_USER['localId']
-                #     filename = os.path.basename(file)
-                #     filesize = os.path.getsize(file)
-
-                #     s.send(
-                #             f"{request_type}{SEPARATOR}{filename}{SEPARATOR}{filesize}"
-                #             .encode('utf-8'))
-
-
                 while True:
 
                     filesize = os.path.getsize(trx_q[i])
@@ -98,6 +86,7 @@ def secure_send(input_file, enc_key):
                                 if not bytes_read:
                                     # file transmitting is done
                                     break
+
                                 # we use sendall to assure transimission in
                                 # busy networks
                                 s.sendall(bytes_read)

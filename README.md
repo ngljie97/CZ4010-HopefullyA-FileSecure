@@ -29,21 +29,27 @@ pip3 install -r requirements.txt
 <br/>
 
 ## Changelog
-### V1.4:
+### V0.2.0
+><ol>
+><li>Sending and downloading file was previously added by Joel</li>
+><li>Added release script (release.py) which will copy files for server and client release respectively into the release folder.</li>
+><li>Other bug fixes here and there.</li>
+></ol>
+### V0.1.4:
 ><ol>
 ><li>User can now exchange file password (in plaintext for now. Encryption to be done with asymmetric encryption, tentatively RSA)</li>
 ><li>Database entries now contains more information required for the file/password exchange.</li>
 ><li>Added functionality of computing hash of the encryption key which will be stored in database. Required for validation.</li>
 ></ol>
 
-### V1.3:
+### V0.1.3:
 ><ol>
 ><li>Added data_controller for communication with Firebase database.</li>
 ><li>Initial integration to include insertion of database entries.</li>
 ><li>Changes to global variables to cater for more variables sharing</li>
 ></ol>
 
-### V1.2:
+### V0.1.2:
 ><ol>
 ><li>Added IS_AUTHENTICATED bool expression to globals variable.</li>
 ><li>Added MAX_LOGIN_ATTEMPTS to globals as well for easier updating.</li>
@@ -54,13 +60,13 @@ pip3 install -r requirements.txt
 ><li>Added the option to sign out in client_view.</li>
 ></ol>
 
-### V 1.1:
+### V0.1.1:
 ><ol>
 ><li>Updated directory structure. Separate controllers and implementaion classes.</li>
 ><li>RAID and AES implementation completed.</li>
 ></ol>
 
-### V 1.0:
+### V0.1.0:
 ><ol>
 ><li>Initial drafting of code skeletal structure and code testing classes. </li>
 ><li>Lots of trial-and-error steps ommited from the changelog.</li>

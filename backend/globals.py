@@ -3,6 +3,7 @@ import os
 from pyrebase import pyrebase
 
 
+# File containing basic variables for the program to function
 def init():
     global PROJ_ROOT
     global AUTH_USER
@@ -13,7 +14,13 @@ def init():
     global MAX_LOGIN_ATTEMPTS
     global FIREBASE_CONN
 
-    # Basic variables initialization for program to run
+    ## ==================Change this section to your own configurations ============================
+    SERVER_IP = '192.168.99.121'
+    SERVER_PORT = 65432
+    SERVER_ROOT = '/home/cz4010fs/'
+    ## ======================End of section to be editted===========================================
+
+    # The following variables do not have to be changed. Do it at your own risk!
     PROJ_ROOT = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
     __PATH_TO_KEY = os.path.join(PROJ_ROOT, 'backend', 'secret',
                                  'firebase-privatekey.json')

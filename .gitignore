@@ -7,3 +7,6 @@ backend/__pycache__/
 backend/controllers/__pycache__/
 backend/implementations/__pycache__/
 frontend/__pycache__/
+release/
+server_release.zip
+client_release.zip
