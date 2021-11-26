@@ -1,4 +1,3 @@
-import time
 from backend import globals
 from frontend import client_view as view
 
