@@ -21,7 +21,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             conn, addr = s.accept()
             print(f"[+] {addr} has connected.")
         except KeyboardInterrupt:
-            s.shutdown()
             s.close()
 
         while True:
