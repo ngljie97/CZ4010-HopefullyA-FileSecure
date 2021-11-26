@@ -22,6 +22,7 @@ class FileMeta(object):
         self.file_name = ''
         self.file_size = ''
         self.remarks = ''
+        self.timestamp = ''
 
 
 # Sending file to server
@@ -122,7 +123,7 @@ def secure_download(file, dest_dir):
     try:
         file_name, file_infos = file
 
-        file_name = file_name[:-4] + '.' + file_name[-3:]
+        file_name = file_name.replace('<dot>', '.')
         filesize = file_infos['file_size']
         uploader_id = file_infos['uploader_id']
 
@@ -140,7 +141,7 @@ def secure_download(file, dest_dir):
                 part_name = file_name + '.p' + str(part_no) + '.enc'
 
                 s.send(
-                    f"{request_type}{SEPARATOR}{uploader_id}{SEPARATOR}{part_name}{SEPARATOR}{0}"
+                    f"{request_type}{SEPARATOR}{uploader_id}{SEPARATOR}{part_name}{SEPARATOR}0"
                     .encode())
 
                 file_size = 0

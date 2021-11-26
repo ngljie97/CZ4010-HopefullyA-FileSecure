@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 
 from backend import globals
@@ -25,7 +24,7 @@ class DataManager(object):
         # Current date time in local system.
         timestamp = datetime.now()
 
-        file_name = file_name.replace('.', '_')
+        file_name = file_name.replace('.', '<dot>')
 
         # Checks if file with same name exists.
         if self.entry_exist(key_1=user_id, key_2=file_name):
@@ -55,7 +54,7 @@ class DataManager(object):
         # Current date time in local system.
         timestamp = datetime.now()
         req_display_name = globals.AUTH_USER['email'].split('@')[0]
-        file_name = file_name.replace('.', '_')
+        file_name = file_name.replace('.', '<dot>')
         if (self.entry_exist(uploader_id, file_name)):
             if self.entry_exist(user_id, file_name, uploader_id):
                 return 'Request was previously made, please check if it has already been approved.'
@@ -76,7 +75,7 @@ class DataManager(object):
         else:
             return 'Requested file is no longer in the server.'
 
-     # Insert public key
+    # Insert public key
     def insert_public_key(self, user_id, public_key):
 
         db.child('PUBLICKEY').child(user_id).set(public_key)
@@ -147,7 +146,7 @@ class DataManager(object):
                 # @Joel this portion needs your input
                 public_key = db.child('PUBLICKEY').child(
                     request_info['requester']).get().val()
-                public_key = bytes(public_key, 'utf-8')    
+                public_key = bytes(public_key, 'utf-8')
                 # encrypt this 'password' @Joel
                 exchange_secret = encryptRSA(public_key, password)
 
@@ -164,8 +163,8 @@ class DataManager(object):
 
         else:
             db.child('DOWNLOAD').child(request_info['requester']).child(
-                request_info['file_name']).child(
-                    request_info['approval_status']).update('REJECTED')
+                request_info['file_name']).update(
+                    {'approval_status': 'REJECTED'})
             return 'REJECTED'
 
     def entry_exist(self, key_1, key_2, key_3=0):

@@ -1,10 +1,9 @@
 import time
 from backend import globals
-from backend.controllers.auth_controller import AuthManager
 from frontend import client_view as view
 
 globals.init()
-auth = AuthManager()
+
 while True:
     while not globals.IS_AUTHENTICATED:
         option = view.index_page()
@@ -16,28 +15,23 @@ while True:
                     print(
                         'Too many failed attempts. Please sign up if you do not have an account.\nTerminating session...'
                     )
-                    auth = 0
-                    exit()
+                    input('Press ENTER to continue...')
+                    break
 
                 if attmp < 3:
                     print('Login failed. Please try again.')
 
-                email, password = view.cred_prompt()
-                print(auth.signin(email=email, password=password))
-                email, password = (0, 0)
-
-                time.sleep(2)
+                view.cred_prompt('signin')
 
                 if globals.IS_AUTHENTICATED:
+                    input('Press ENTER to continue...')
                     break
                 else:
-                    attmp = attmp - 1
+                    attmp -= 1
 
         elif option == '2':
-            email, password = view.cred_prompt()
-            print(auth.signup(email=email, password=password))
-            email, password = (0, 0)
-            input('Press enter to continue...')
+            view.cred_prompt('signup')
+            input('Press ENTER to continue...')
 
         elif option == '3':
             exit()
@@ -59,4 +53,7 @@ while True:
             view.dwload_file_page()
 
         elif option == '5':
-            auth.signout()
+            view.signout_page()
+
+        else:
+            input('Invalid option. Press ENTER to continue...')

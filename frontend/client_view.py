@@ -3,8 +3,17 @@
 
 import os
 import time
+from getpass import getpass
+from datetime import datetime
+
 from backend import globals
+from backend.controllers.auth_controller import AuthManager
+from backend.implementations.input_validator import check_email, check_file, check_password
 from backend.controllers.client_controller import get_dwnls, get_all_files, FileMeta, request_download, get_file_requests, process_request, secure_download, secure_send
+
+from prettytable import PrettyTable
+
+auth = AuthManager()
 
 
 def clearConsole():
@@ -25,10 +34,16 @@ def index_page():
     return input('Enter your choice:\t')
 
 
-def cred_prompt():
+def cred_prompt(op_type):
     user_email = input('Enter your email:\t')
-    user_passw = input('Enter your password:\t')
-    return (user_email, user_passw)
+    if check_email(user_email):
+        user_passw = getpass('Enter your password:\t')
+
+        if check_password(user_passw):
+            if op_type == 'signin':
+                print(auth.signin(email=user_email, password=user_passw))
+            elif op_type == 'signup':
+                print(auth.signup(email=user_email, password=user_passw))
 
 
 def user_menu():
@@ -37,7 +52,7 @@ def user_menu():
     print(f'Logged in as: {user}')
     print('1. Upload a file.')
     print('2. Request file download.')
-    print('3. View download requests.')
+    print('3. Approve download requests.')
     print('4. View downloadable files.')
     print('5. Logout.')
     return input('Enter your choice:\t')
@@ -45,88 +60,140 @@ def user_menu():
 
 def upload_file_page():
     clearConsole()
-    file_location = input('Enter the full directory to the file:\t')
-    encryption_key = input('Enter a passkey for the encryption:\t')
-    print(secure_send(file_location, encryption_key))
+    print('=-=-=-=-=-=-=-=-| File Upload |-=-=-=-=-=-=-=-=')
+
+    file_location = input(
+        'Enter the absolute path to the file. (e.g. C:/path/to/file.txt):\n'
+    ).strip('"')
+    if check_file(file_location):
+        print(
+            'Enter a passkey for encryption. Please keep the key safe and secure. Do not let anyone else know the key.\n This key will not be stored in the server so do not lose it.'
+        )
+        encryption_key = input('Passkey:\t')
+        print(secure_send(file_location, encryption_key))
+
+    input('Press ENTER to continue...')
 
 
 def request_file_page():
-    print('List of files:')
-    entries = get_all_files()
+    clearConsole()
+    print('=-=-=-=-=-=-=-=-| Download a file |-=-=-=-=-=-=-=-=\n')
 
-    data = []
-    i = 1
+    try:
+        entries = get_all_files()
 
-    for user, files in entries.items():
-        for file_name, file_info in files.items():
-            file = FileMeta()
-            file.file_name = file_name
-            file.uploader_id = user
-            file.uploader_name = file_info['display_name']
-            file.file_size = file_info['filesize']
+        data = []
+        i = 1
+        file_table = PrettyTable(
+            ['No.', 'File Name', 'Uploaded by', 'Uploaded on'])
 
-            data.append(file)
-            print(
-                f'{str(i)}. {file.file_name}\t uploaded by {file.uploader_name}'
-            )
+        for user, files in entries.items():
+            for file_name, file_info in files.items():
+                file = FileMeta()
+                file.file_name = file_name.replace('<dot>', '.')
+                file.uploader_id = user
+                file.uploader_name = file_info['display_name']
+                file.file_size = file_info['filesize']
+                file.timestamp = datetime.fromisoformat(
+                    file_info['timestamp']).strftime("%d/%m/%Y")
 
-            i = i + 1
+                data.append(file)
+                file_table.add_row(
+                    [i, file.file_name, file.uploader_name, file.timestamp])
 
-    if len(data) > 0:
-        select = int(
-            input('Enter file to download (the number on the left):\t'))
-        if 0 <= (select - 1) < len(data):
-            selected_file = data[select - 1]
-            remarks = input(
-                'Enter a message to display for the owner of the file to approve your resquest (WARNING: do not enter any personal information/credentials):\n'
-            )
-            selected_file.remarks = remarks
-            print(request_download(selected_file))
-    else:
-        print('No files to download. Exitting..')
+                i += 1
+
+        if len(data) > 0:
+            print(file_table)
+            select = input(
+                'Enter the number for the file to download (q to quit):\t')
+
+            try:
+                if select.upper() == 'Q':
+                    input('Operation cancelled. Press ENTER to continue...')
+                    return 0
+
+                select = int(select)
+            except ValueError:
+                input('Invalid input. Press ENTER to continue...')
+
+            if 0 <= (select - 1) < len(data):
+                selected_file = data[select - 1]
+                remarks = input(
+                    'Enter a message to display for the owner of the file to approve your resquest (WARNING: do not enter any personal information/credentials):\n'
+                )
+                selected_file.remarks = remarks
+                print(request_download(selected_file))
+                input('Press ENTER to continue...')
+        else:
+            input('No files to download. Press ENTER to continue..')
+    except:
+        return 0
 
 
 def dwnl_reqst_page():
     clearConsole()
-    print('Here are the lists of file requests made to you:')
-    print('i\tFile\tRequested by\tApproval Status\t')
-    entries = get_file_requests()
+    print('=-=-=-=-=-=-=-=-| File Approval |-=-=-=-=-=-=-=-=')
 
-    if len(entries) < 1:
-        print('\nNothing to display here. Returning...\n')
+    try:
+        entries = get_file_requests()
 
-    else:
-        i = 1
-        for entry in entries:
-            file_name = entry['file_name']
-            req_display_name = entry['req_display_name']
-            approval_status = entry['approval_status']
-            print(
-                f'{str(i)}\t{file_name}\t{req_display_name}\t{approval_status}'
-            )
-            i = i + 1
+        if len(entries) > 0:
+            req_table = PrettyTable(
+                ['No.', 'File name', 'Requested by', 'Approval Status'])
 
-        sel = input('Enter a file number(i) for more options:\t')
-        if 0 <= int(sel) - 1 < len(entries):
-            message = file_submenu(entries[int(sel) - 1])
-            if message == 'SUCCESS':
-                print('The requests has been approved successfully.')
-            elif message == 'REJECTED':
-                print('The requests has been approved successfully.')
-            elif message == 'WRONG_PASSWORD':
-                print(
-                    'The password you entered for the file is incorrect. Please check and retry.'
+            i = 1
+            for entry in entries:
+                file_name = entry['file_name'].replace('<dot>', '.')
+                req_display_name = entry['req_display_name']
+                approval_status = entry['approval_status']
+                req_table.add_row(
+                    [str(i), file_name, req_display_name, approval_status])
+
+                i += 1
+
+            print(req_table)
+
+            while True:
+                sel = input(
+                    'Enter a file number for more options: (Enter q to return to main menu)\t'
                 )
-        else:
-            print('Invalid file selected.')
+                try:
+                    if sel.upper() == 'Q':
+                        return 0
+                    sel = int(sel)
+                    break
+                except ValueError:
+                    print('Invalid input...')
 
-    time.sleep(2)
-    return 0
+            if 0 <= int(sel) - 1 < len(entries):
+                message = file_submenu(entries[int(sel) - 1])
+                if message == 'SUCCESS':
+                    input(
+                        'The requests has been approved. Press ENTER to continue...'
+                    )
+                elif message == 'REJECTED':
+                    input(
+                        'The requests has been rejected. Press ENTER to continue...'
+                    )
+                elif message == 'WRONG_PASSWORD':
+                    print(
+                        'The password you entered for the file is incorrect. Please check and retry.'
+                    )
+                    input('Press ENTER to continue...')
+            else:
+                input('Invalid file selected. Enter to continue.')
+        else:
+            raise Exception('Nothing to be done.')
+    except:
+        print('No one made any request to you yet! Nothing to be done here.')
+        input('Press ENTER to continue...')
+        return 0
 
 
 def file_submenu(chosen_file):
     clearConsole()
-    file_name = chosen_file['file_name']
+    file_name = chosen_file['file_name'].replace('<dot>', '.')
     req_display_name = chosen_file['req_display_name']
     remarks = chosen_file['remarks']
     print(
@@ -148,38 +215,71 @@ def file_submenu(chosen_file):
 
 
 def dwload_file_page():
-    print('List of files:')
-    print('i\tFile Name\tAprroval Status')
-    files = get_dwnls()
+    clearConsole()
+    print('=-=-=-=-=-=-=-=-| Approved downloads |-=-=-=-=-=-=-=-=\n')
 
-    if len(files) > 0:
-        i = 1
-        selectable_indexes = []
+    try:
+        files = get_dwnls()
 
-        for file_name, file_info in files.items():
-            approval_status = file_info['approval_status']
-            print(f'{str(i)}\t{file_name}\t{approval_status}')
-            if approval_status:
-                selectable_indexes.append(i)
-            i = i + 1
+        if len(files) > 0:
+            i = 1
+            selectable_indexes = []
+            dwnl_table = PrettyTable(['i', 'File Name', 'Approval Status'])
 
-        if len(selectable_indexes) > 0:
-            file_selection = int(
-                input('Enter file number (i) to be downloaded:\t'))
+            for file_name, file_info in files.items():
+                approval_status = file_info['approval_status']
+                dwnl_table.add_row(
+                    [str(i),
+                     file_name.replace('<dot>', '.'), approval_status])
 
-            if file_selection in selectable_indexes:
-                dest_dir = input('Enter destination directory:\t')
+                if approval_status == 'APPROVED':
+                    selectable_indexes.append(i)
 
-                file = list(files.items())[file_selection - 1]
+                i = i + 1
 
-                print(secure_download(file, dest_dir))
+            print(dwnl_table)
+
+            if len(selectable_indexes) > 0:
+                file_selection = int(
+                    input('Enter file number (i) to be downloaded:\t'))
+
+                if file_selection in selectable_indexes:
+                    dest_dir = input('Enter destination directory:\t').strip(
+                        '"')
+
+                    file = list(files.items())[file_selection - 1]
+
+                    print(secure_download(file, dest_dir))
+                    input('Enter to continue...')
+                else:
+                    print(
+                        'Invalid input. Please wait for owner to approve the requests.'
+                    )
+                    input('Enter to continue...')
             else:
-                print(
-                    'Invalid input. Please wait for owner to approve the requests.'
+                input(
+                    'Nothing to do here, please wait for approvals. Press ENTER to continue...'
                 )
-    else:
-        print(
-            '\nNothing to display. Please make a file download requests first.'
-        )
+        else:
+            print(
+                '\nNothing to display. Please make a file download requests first.'
+            )
+            input('Enter to continue...')
 
-    time.sleep(2)
+    except:
+        input('No entries found. Press ENTER to continue...')
+        return 0
+
+
+def signout_page():
+    select = input('Confirm sign out? Y/n\t').upper()
+
+    if select == 'Y':
+        auth.signout()
+        input('Signed out. Press ENTER to continue...')
+        return 0
+    elif select == 'N':
+        return 0
+    else:
+        print('Invalid input.')
+        return signout_page()
