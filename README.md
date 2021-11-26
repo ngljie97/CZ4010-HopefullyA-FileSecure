@@ -31,8 +31,8 @@ pip3 freeze > requirements.txt
 # for client
 pip3 install -r requirements.txt
 
-# for server
-pip3 install -r server_dependency.txt
+# server only requires tqdm library
+pip install tqdm
 ```
 <br/>
 <hr/>
