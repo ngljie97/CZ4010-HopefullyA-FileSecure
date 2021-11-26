@@ -31,6 +31,8 @@ pip3 freeze > requirements.txt
 # for client
 pip3 install -r requirements.txt
 
+Due to some error with pyrebase and pycryptodome, have to install pyrebase, remove the pycryptodome manually (pip uninstall) and install pycryptodome again.
+
 # server only requires tqdm library
 pip install tqdm
 ```
