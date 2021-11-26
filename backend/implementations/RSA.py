@@ -9,7 +9,6 @@ from Crypto.Hash import SHA512
 # from diffiehellman import publicKey
 import os
 
-pk_file_name = 'file name pk'
 
 # Generating key (Public key to be stored in database, private key stored in client machine)
 
