@@ -9,7 +9,11 @@ Project: Secure File-Sharing platform with untrusted Intermediary
 ## Getting started
 - Setting up the server
   - Navigate to \server_side and copy the contents to your desired location in the server machine (file sharing host).
-  - Modify 'SERVER_PORT' and 'SERVER_ROOT' to fit your needs.
+
+  - Running the server (Admin or sudo required)
+    ```
+    python3 server_app.py
+    ```
 
 - Running the client (from project root)
   ```
@@ -41,6 +45,12 @@ pip install tqdm
 <br/>
 
 ## Changelog
+
+### V1.1.0
+><ol>
+><li>Usability Improvements.</li>
+><li>Code clean up.</li>
+></ol>
 
 ### V1.0.0
 ><ol>
