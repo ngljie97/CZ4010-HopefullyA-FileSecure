@@ -64,21 +64,6 @@ def storePublicKey(public_key):
         f.write(pem)
 
 
-# Getting keys (Examples Only)
-def getPrivateKey(key_name):
-    with open(globals.PROJ_ROOT + '\\privatekey\\' + key_name, "rb") as key_file:
-        private_key = serialization.load_pem_private_key(
-            key_file.read(), password=None, backend=default_backend())
-    return private_key
-
-
-def getPublicKey():
-    with open("public_key.pem", "rb") as key_file:
-        public_key = serialization.load_pem_public_key(
-            key_file.read(), backend=default_backend())
-    return public_key
-
-
 # Encrypting
 def encryptRSA(public_key, message):
     message = bytes(message, 'utf-8')
