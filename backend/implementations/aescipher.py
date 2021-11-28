@@ -25,7 +25,7 @@ class AESCipher(object):
 
     def encrypt(self, file):
         nonce = Random.new().read(AES.block_size)
-        # extra step: store hash of nonce to ensure that it was never used before. else regen.
+
         cipher = AES.new(self.key, AES.MODE_EAX, nonce=nonce)
 
         with open(file, 'rb') as f:
@@ -59,14 +59,14 @@ class AESCipher(object):
     def getKeyHash(self):
         hash_md5 = hashlib.md5()
         hash_md5.update(self.key)
-        
+
         return hash_md5.hexdigest()
 
 
-""" cipher = AESCipher('12345')
-cipher.encrypt(
-    "C:\\Users\\nglji\\OneDrive\\Documents\\School\\CZ4010\\backend\\test\\original.txt"
-)
-cipher.decrypt(
-    "C:\\Users\\nglji\\OneDrive\\Documents\\School\\CZ4010\\backend\\test\\original.txt.enc"
-) """
+def stringHash(string):
+    out = hashlib.md5()
+    salt = '1eVeflPhacHiklphEP7*$aMahoXlpH-?'
+    out.update(string.encode())
+    out.update(salt.encode())
+
+    return out.hexdigest()

@@ -14,7 +14,7 @@ def init():
     global FIREBASE_CONN
 
     ## ==================Change this section to your own configurations ============================
-    SERVER_IP = '192.168.33.79'
+    SERVER_IP = '127.0.0.1'
     SERVER_PORT = 65432
     ## ======================End of section to be editted===========================================
 

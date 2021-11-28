@@ -3,7 +3,7 @@ import socket
 import tqdm
 from backend.controllers.data_controller import DataManager
 from backend.implementations.RSA import decryptRSA
-from backend.implementations.aescipher import AESCipher
+from backend.implementations.aescipher import AESCipher, stringHash
 from backend.implementations.raid import Raid3Manager
 from backend import globals
 
@@ -73,11 +73,12 @@ def secure_send(input_file, enc_key):
 
                 for file in trx_q:
                     user_id = globals.AUTH_USER['localId']
+                    hashed_user_id = stringHash(user_id)
                     file_name = os.path.basename(file)
                     file_size = os.path.getsize(file)
 
                     s.send(
-                        f"{request_type}{SEPARATOR}{user_id}{SEPARATOR}{file_name}{SEPARATOR}{file_size}"
+                        f"{request_type}{SEPARATOR}{hashed_user_id}{SEPARATOR}{file_name}{SEPARATOR}{file_size}"
                         .encode())
 
                     status = ''
@@ -126,6 +127,7 @@ def secure_download(file, dest_dir):
         file_name = file_name.replace('<dot>', '.')
         filesize = file_infos['file_size']
         uploader_id = file_infos['uploader_id']
+        hashed_user_id = stringHash(uploader_id)
 
         # Receive 3 files from server to the dest_dir
         request_type = "Download"
@@ -141,7 +143,7 @@ def secure_download(file, dest_dir):
                 part_name = file_name + '.p' + str(part_no) + '.enc'
 
                 s.send(
-                    f"{request_type}{SEPARATOR}{uploader_id}{SEPARATOR}{part_name}{SEPARATOR}0"
+                    f"{request_type}{SEPARATOR}{hashed_user_id}{SEPARATOR}{part_name}{SEPARATOR}0"
                     .encode())
 
                 file_size = 0

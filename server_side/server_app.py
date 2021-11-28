@@ -42,6 +42,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                                      unit_divisor=1024)
 
                 dest_dir = os.path.join(SERVER_ROOT, user_id)
+                
                 if not os.path.exists(dest_dir):
                     os.makedirs(dest_dir)
 
